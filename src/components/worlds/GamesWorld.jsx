@@ -6,6 +6,7 @@ import gsap from 'gsap';
 import { Box, Expand, Film, Gamepad2, Layers, Play, SplitSquareHorizontal, Volume2, VolumeX, X, Zap } from 'lucide-react';
 import GameBootOverlay from '../GameBootOverlay';
 import { sfx } from '../../utils/sfx';
+import { assetUrl } from '../../utils/assetUrl';
 import {
   OPOSSUM_GAMEPLAY_CLIPS,
   OPOSSUM_PROPS,
@@ -787,7 +788,7 @@ export default function GamesWorld({ lang, onInspectProject }) {
                   onClick={() => onInspectProject(activeProject)}
                 >
                   <div className="taw-trailer-thumb">
-                    <img src="/media/taw-breaker/trailer_poster.jpg" alt="Taw Breaker Trailer" />
+                    <img src={assetUrl('/media/taw-breaker/trailer_poster.jpg')} alt="Taw Breaker Trailer" />
                     <span className="taw-trailer-play">
                       <Play size={16} fill="currentColor" />
                     </span>

@@ -1,4 +1,6 @@
-﻿export const UI_TEXT = {
+﻿import { prefixAssets } from '../utils/assetUrl';
+
+export const UI_TEXT = {
   es: {
     roleLine: 'TECHNICAL ARTIST · REAL-TIME VISUALS · LIVE VJ · 3D PROP ARTIST',
     heroTag: 'PORTAFOLIO INTERACTIVO // 4 MUNDOS · 23 PROYECTOS',
@@ -91,7 +93,7 @@
   },
 };
 
-export const WORLDS = [
+export const WORLDS = prefixAssets([
   {
     id: 'stage',
     index: '01',
@@ -164,9 +166,9 @@ export const WORLDS = [
     poster: '/media/opossum-atelier/renders/hero-beauty.jpg',
     coords: '01.00°U // ENGINE_ARENA',
   },
-];
+]);
 
-export const PROJECTS = [
+export const PROJECTS = prefixAssets([
   // ===================== WORLD 01: STAGE & VJ (WITH REAL PIXELMAP 3D RIGS) =====================
   {
     id: 'sonar-park',
@@ -797,9 +799,9 @@ export const PROJECTS = [
       { type: 'image', src: '/media/opossum-atelier/renders/04-pincel-beauty.jpg', caption: { es: '04 — Pincel Artesanal (728 Quads)', en: '04 — Natural Bristle Paintbrush (728 Quads)' } },
     ],
   },
-];
+]);
 
-export const TAW_BREAKER_DEVLOGS = [
+export const TAW_BREAKER_DEVLOGS = prefixAssets([
   {
     id: 'devlog-1',
     num: '01',
@@ -878,9 +880,9 @@ export const TAW_BREAKER_DEVLOGS = [
       ],
     },
   },
-];
+]);
 
-export const OPOSSUM_PROPS = [
+export const OPOSSUM_PROPS = prefixAssets([
   {
     slug: '01-silla-rimax',
     code: 'Prop_sillarimax',
@@ -1001,9 +1003,9 @@ export const OPOSSUM_PROPS = [
     roughness: '/media/opossum-atelier/models/08-cesped-roughness.jpg',
     metallic: null,
   },
-];
+]);
 
-export const OPOSSUM_GAMEPLAY_CLIPS = [
+export const OPOSSUM_GAMEPLAY_CLIPS = prefixAssets([
   {
     id: 'patio-props',
     num: '01',
@@ -1049,5 +1051,5 @@ export const OPOSSUM_GAMEPLAY_CLIPS = [
       en: 'Live assembly · Brush & paint tools · Final turnaround',
     },
   },
-];
+]);
 

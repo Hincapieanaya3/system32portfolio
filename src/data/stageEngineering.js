@@ -1,3 +1,5 @@
+import { assetUrl, prefixAssets } from '../utils/assetUrl';
+
 export const BUILD_PHASES = [
   {
     step: 1,
@@ -37,7 +39,7 @@ export const BUILD_PHASES = [
   },
 ];
 
-export const STAGE_ENGINEERING = {
+export const STAGE_ENGINEERING = prefixAssets({
   'sonar-square': {
     compWidth: 1024,
     compHeight: 1024,
@@ -170,7 +172,7 @@ export const STAGE_ENGINEERING = {
       { x: 4992, y: 640, w: 384, h: 640, label: 'PORTAL R' },
     ],
   },
-};
+});
 
 export function getStageEngineeringSpec(project) {
   if (!project) return null;
@@ -180,7 +182,7 @@ export function getStageEngineeringSpec(project) {
   if (project.id === 'alba-franch') {
     return {
       ...base,
-      pixelmapUrl: project.pixelmapImage || '/media/pixelmaps/albafranch-pxmap.png',
+      pixelmapUrl: project.pixelmapImage || assetUrl('/media/pixelmaps/albafranch-pxmap.png'),
       hardware: 'Resolume Arena (DXV3 Alpha) · 1024×1024 · Alba Franch',
       slices: [
         {

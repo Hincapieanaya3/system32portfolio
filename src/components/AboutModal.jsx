@@ -14,13 +14,14 @@ import {
 } from 'lucide-react';
 import { UI_TEXT } from '../data/portfolioData';
 import { RESUME } from '../data/resumeData';
+import { assetUrl } from '../utils/assetUrl';
 
 const EMAIL = 'sebashinca13@gmail.com';
 const PHONE_DISPLAY = '+57 311 715 6014';
 const PHONE_LINK = '+573117156014';
 const LINKEDIN_URL = 'https://www.linkedin.com/in/sebastianhin';
 const BEHANCE_URL = 'https://www.behance.net/sebastihincapi12';
-const RESUME_PDF = '/Sebastian_Hincapie_Resume.pdf';
+const RESUME_PDF = assetUrl('/Sebastian_Hincapie_Resume.pdf');
 
 const TABS = [
   { id: 'profile', label: { en: 'PROFILE', es: 'PERFIL' } },

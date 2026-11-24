@@ -12,6 +12,7 @@ import ProjectModal from './components/ProjectModal';
 import ArchiveModal from './components/ArchiveModal';
 import AboutModal from './components/AboutModal';
 import { WORLDS } from './data/portfolioData';
+import { assetUrl, prefixAssets } from './utils/assetUrl';
 
 export default function App() {
   const [activeWorld, setActiveWorld] = useState('intro');
@@ -30,10 +31,10 @@ export default function App() {
   }, [lang]);
 
   useEffect(() => {
-    fetch('/media/manifest.json')
+    fetch(assetUrl('/media/manifest.json'))
       .then((r) => (r.ok ? r.json() : null))
       .then((data) => {
-        if (data) setManifest(data);
+        if (data) setManifest(prefixAssets(data));
       })
       .catch(() => {});
   }, []);

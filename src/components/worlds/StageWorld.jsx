@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { PROJECTS, UI_TEXT, WORLDS } from '../../data/portfolioData';
 import { getStageEngineeringSpec, STAGE_ENGINEERING } from '../../data/stageEngineering';
+import { assetUrl } from '../../utils/assetUrl';
 import SliceMonitor2D, { BuildScrubberDock } from '../SliceMonitor2D';
 
 const BEAM_VERT = `
@@ -384,11 +385,11 @@ export default function StageWorld({ lang, manifest, onInspectProject }) {
 
     // Preload all project pixelmap textures
     [
-      '/media/pixelmaps/peterblue-pxmap.jpg',
-      '/media/pixelmaps/albafranch-pxmap.png',
-      '/media/pixelmaps/castrii-pxmap.png',
-      '/media/pixelmaps/semana-pxmap.jpg',
-      '/media/pixelmaps/sophii-pxmap.jpg',
+      assetUrl('/media/pixelmaps/peterblue-pxmap.jpg'),
+      assetUrl('/media/pixelmaps/albafranch-pxmap.png'),
+      assetUrl('/media/pixelmaps/castrii-pxmap.png'),
+      assetUrl('/media/pixelmaps/semana-pxmap.jpg'),
+      assetUrl('/media/pixelmaps/sophii-pxmap.jpg'),
     ].forEach((url) => getImageTexture(url));
 
     const trussMat = new THREE.MeshStandardMaterial({
@@ -434,7 +435,7 @@ export default function StageWorld({ lang, manifest, onInspectProject }) {
       opacity: 1,
     });
     const semanaPxMat = new THREE.MeshBasicMaterial({
-      map: getImageTexture('/media/pixelmaps/semana-pxmap.jpg'),
+      map: getImageTexture(assetUrl('/media/pixelmaps/semana-pxmap.jpg')),
       transparent: true,
       opacity: 1,
     });
