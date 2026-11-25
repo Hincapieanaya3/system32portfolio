@@ -1,0 +1,368 @@
+{
+  "id": "sonar-park",
+  "world": "stage",
+  "order": 1,
+  "title": "SONAR PARK 2026 - PETERBLUE",
+  "year": "2026",
+  "role": {
+    "es": "Dirección Visual & Operación Resolume DXV3",
+    "en": "Visual Direction & Resolume DXV3 Operation"
+  },
+  "tools": [
+    "Resolume Arena 7 (DXV3)",
+    "After Effects",
+    "1024×1024 Pixelmap",
+    "180 BPM Sync"
+  ],
+  "summary": {
+    "es": "Escenario 1:1 monolítico (1024×1024) para el show de Peter Blue en Sónar Park 2026. Arquitectura de 4 capas en Resolume Arena (Autopilot base, textos rítmicos, logos y Stroboscope Difference Ready-to-Map) con protocolo técnico profesional.",
+    "en": "Monolithic 1:1 square LED wall (1024×1024) for Peter Blue at Sónar Park 2026. Engineered as a 4-layer Resolume Arena show (Autopilot base, kinetic phrases, brand overlays & Ready-to-Map Difference Stroboscope) with full technical rider."
+  },
+  "poster": "media/behance/sonar-park/poster.jpg",
+  "preview": "media/stages/peterblue/square-preview.mp4",
+  "w": 960,
+  "h": 960,
+  "color": "#006eff",
+  "nodeType": "",
+  "liveSet": null,
+  "gallery": [
+    {
+      "type": "video",
+      "src": "media/stages/peterblue/frases/peterblue_blanco_alpha.mp4",
+      "poster": "media/stages/peterblue/frases/peterblue_blanco_alpha.jpg",
+      "w": 768,
+      "h": 768,
+      "caption": {
+        "es": "★PETERBLUE — Logo Animado Blanco (ProRes 4444 Alpha · 1024×1024)",
+        "en": "★PETERBLUE — Animated White Logo (ProRes 4444 Alpha · 1024×1024)"
+      }
+    },
+    {
+      "type": "video",
+      "src": "media/stages/peterblue/frases/peterblue_azul_alpha.mp4",
+      "poster": "media/stages/peterblue/frases/peterblue_azul_alpha.jpg",
+      "w": 768,
+      "h": 768,
+      "caption": {
+        "es": "★PETERBLUE — Logo Animado Azul (ProRes 4444 Alpha · 1024×1024)",
+        "en": "★PETERBLUE — Animated Blue Logo (ProRes 4444 Alpha · 1024×1024)"
+      }
+    },
+    {
+      "type": "video",
+      "src": "media/stages/peterblue/frases/dile_que_bailando_te_conoci.mp4",
+      "poster": "media/stages/peterblue/frases/dile_que_bailando_te_conoci.jpg",
+      "w": 768,
+      "h": 768,
+      "caption": {
+        "es": "Frase Cinética — Dile Que Bailando Te Conocí",
+        "en": "Kinetic Phrase — Dile Que Bailando Te Conocí"
+      }
+    },
+    {
+      "type": "video",
+      "src": "media/stages/peterblue/frases/donde_estan_las_gatas.mp4",
+      "poster": "media/stages/peterblue/frases/donde_estan_las_gatas.jpg",
+      "w": 768,
+      "h": 768,
+      "caption": {
+        "es": "Frase Cinética — ¿Dónde Están Las Gatas?",
+        "en": "Kinetic Phrase — ¿Dónde Están Las Gatas?"
+      }
+    },
+    {
+      "type": "video",
+      "src": "media/stages/peterblue/frases/el_cuerpo_rozar.mp4",
+      "poster": "media/stages/peterblue/frases/el_cuerpo_rozar.jpg",
+      "w": 768,
+      "h": 768,
+      "caption": {
+        "es": "Frase Cinética — El Cuerpo Rozar",
+        "en": "Kinetic Phrase — El Cuerpo Rozar"
+      }
+    },
+    {
+      "type": "video",
+      "src": "media/stages/peterblue/frases/ese_culo_esta_bendecido.mp4",
+      "poster": "media/stages/peterblue/frases/ese_culo_esta_bendecido.jpg",
+      "w": 768,
+      "h": 768,
+      "caption": {
+        "es": "Frase Cinética — Ese Culo Está Bendecido",
+        "en": "Kinetic Phrase — Ese Culo Está Bendecido"
+      }
+    },
+    {
+      "type": "video",
+      "src": "media/stages/peterblue/frases/es_un_llamado_de_emergencia.mp4",
+      "poster": "media/stages/peterblue/frases/es_un_llamado_de_emergencia.jpg",
+      "w": 768,
+      "h": 768,
+      "caption": {
+        "es": "Frase Cinética — Es Un Llamado de Emergencia",
+        "en": "Kinetic Phrase — Es Un Llamado de Emergencia"
+      }
+    },
+    {
+      "type": "video",
+      "src": "media/stages/peterblue/frases/la_makina_latina.mp4",
+      "poster": "media/stages/peterblue/frases/la_makina_latina.jpg",
+      "w": 768,
+      "h": 768,
+      "caption": {
+        "es": "Frase Cinética — La Makina Latina (Blanco)",
+        "en": "Kinetic Phrase — La Makina Latina (White)"
+      }
+    },
+    {
+      "type": "video",
+      "src": "media/stages/peterblue/frases/la_makina_latina_2.mp4",
+      "poster": "media/stages/peterblue/frases/la_makina_latina_2.jpg",
+      "w": 768,
+      "h": 768,
+      "caption": {
+        "es": "Frase Cinética — La Makina Latina (Azul)",
+        "en": "Kinetic Phrase — La Makina Latina (Blue)"
+      }
+    },
+    {
+      "type": "video",
+      "src": "media/stages/peterblue/frases/nadie_me_quita_lo_tumbado.mp4",
+      "poster": "media/stages/peterblue/frases/nadie_me_quita_lo_tumbado.jpg",
+      "w": 768,
+      "h": 768,
+      "caption": {
+        "es": "Frase Cinética — Nadie Me Quita Lo Tumbado",
+        "en": "Kinetic Phrase — Nadie Me Quita Lo Tumbado"
+      }
+    },
+    {
+      "type": "video",
+      "src": "media/stages/peterblue/frases/no_puedo_seguir_sufriendo.mp4",
+      "poster": "media/stages/peterblue/frases/no_puedo_seguir_sufriendo.jpg",
+      "w": 768,
+      "h": 768,
+      "caption": {
+        "es": "Frase Cinética — No Puedo Seguir Sufriendo Por Esa Mujer",
+        "en": "Kinetic Phrase — No Puedo Seguir Sufriendo Por Esa Mujer"
+      }
+    },
+    {
+      "type": "video",
+      "src": "media/stages/peterblue/frases/pa_que_la_pases_bien.mp4",
+      "poster": "media/stages/peterblue/frases/pa_que_la_pases_bien.jpg",
+      "w": 768,
+      "h": 768,
+      "caption": {
+        "es": "Frase Cinética — Pa' Que La Pases Bien",
+        "en": "Kinetic Phrase — Pa' Que La Pases Bien"
+      }
+    },
+    {
+      "type": "video",
+      "src": "media/stages/peterblue/frases/peterblue_fondo_azul.mp4",
+      "poster": "media/stages/peterblue/frases/peterblue_fondo_azul.jpg",
+      "w": 768,
+      "h": 768,
+      "caption": {
+        "es": "Identidad LED — Peter Blue (Fondo Azul / Letra Blanca)",
+        "en": "LED Identity — Peter Blue (Blue BG / White Type)"
+      }
+    },
+    {
+      "type": "video",
+      "src": "media/stages/peterblue/frases/peterblue_fondo_blanco.mp4",
+      "poster": "media/stages/peterblue/frases/peterblue_fondo_blanco.jpg",
+      "w": 768,
+      "h": 768,
+      "caption": {
+        "es": "Identidad LED — Peter Blue (Fondo Blanco / Letra Azul)",
+        "en": "LED Identity — Peter Blue (White BG / Blue Type)"
+      }
+    },
+    {
+      "type": "video",
+      "src": "media/stages/peterblue/frases/peterblue_horizontal.mp4",
+      "poster": "media/stages/peterblue/frases/peterblue_horizontal.jpg",
+      "w": 768,
+      "h": 768,
+      "caption": {
+        "es": "Identidad LED — Peter Blue Scroll Horizontal",
+        "en": "LED Identity — Peter Blue Horizontal Scroll"
+      }
+    },
+    {
+      "type": "video",
+      "src": "media/stages/peterblue/frases/por_que_te_demoras.mp4",
+      "poster": "media/stages/peterblue/frases/por_que_te_demoras.jpg",
+      "w": 768,
+      "h": 768,
+      "caption": {
+        "es": "Frase Cinética — ¿Por Qué Te Demoras?",
+        "en": "Kinetic Phrase — ¿Por Qué Te Demoras?"
+      }
+    },
+    {
+      "type": "video",
+      "src": "media/stages/peterblue/frases/salgo_pa_la_calle_sin_rumbo.mp4",
+      "poster": "media/stages/peterblue/frases/salgo_pa_la_calle_sin_rumbo.jpg",
+      "w": 768,
+      "h": 768,
+      "caption": {
+        "es": "Frase Cinética — Salgo Pa' La Calle Sin Rumbo",
+        "en": "Kinetic Phrase — Salgo Pa' La Calle Sin Rumbo"
+      }
+    },
+    {
+      "type": "video",
+      "src": "media/stages/peterblue/frases/si_te_quieres_divertir_2.mp4",
+      "poster": "media/stages/peterblue/frases/si_te_quieres_divertir_2.jpg",
+      "w": 768,
+      "h": 768,
+      "caption": {
+        "es": "Frase Cinética — Si Te Quieres Divertir (Zoom)",
+        "en": "Kinetic Phrase — Si Te Quieres Divertir (Zoom)"
+      }
+    },
+    {
+      "type": "video",
+      "src": "media/stages/peterblue/frases/si_te_quieres_divertir_con_encanto.mp4",
+      "poster": "media/stages/peterblue/frases/si_te_quieres_divertir_con_encanto.jpg",
+      "w": 768,
+      "h": 768,
+      "caption": {
+        "es": "Frase Cinética — Si Te Quieres Divertir Con Encanto",
+        "en": "Kinetic Phrase — Si Te Quieres Divertir Con Encanto"
+      }
+    },
+    {
+      "type": "video",
+      "src": "media/behance/sonar-park/item_01.mp4",
+      "poster": "media/behance/sonar-park/item_01.poster.jpg",
+      "w": 720,
+      "h": 1280,
+      "caption": {
+        "es": "Visual Base Sónar Park — Loop 01",
+        "en": "Sónar Park Base Visual — Loop 01"
+      }
+    },
+    {
+      "type": "video",
+      "src": "media/behance/sonar-park/item_02.mp4",
+      "poster": "media/behance/sonar-park/item_02.poster.jpg",
+      "w": 720,
+      "h": 720,
+      "caption": {
+        "es": "Visual Base Sónar Park — Loop 02",
+        "en": "Sónar Park Base Visual — Loop 02"
+      }
+    },
+    {
+      "type": "video",
+      "src": "media/behance/sonar-park/item_03.mp4",
+      "poster": "media/behance/sonar-park/item_03.poster.jpg",
+      "w": 720,
+      "h": 720,
+      "caption": {
+        "es": "Visual Base Sónar Park — Loop 03",
+        "en": "Sónar Park Base Visual — Loop 03"
+      }
+    },
+    {
+      "type": "video",
+      "src": "media/behance/sonar-park/item_04.mp4",
+      "poster": "media/behance/sonar-park/item_04.poster.jpg",
+      "w": 720,
+      "h": 720,
+      "caption": {
+        "es": "Visual Base Sónar Park — Loop 04",
+        "en": "Sónar Park Base Visual — Loop 04"
+      }
+    },
+    {
+      "type": "video",
+      "src": "media/behance/sonar-park/item_05.mp4",
+      "poster": "media/behance/sonar-park/item_05.poster.jpg",
+      "w": 720,
+      "h": 720,
+      "caption": {
+        "es": "Visual Base Sónar Park — Loop 05",
+        "en": "Sónar Park Base Visual — Loop 05"
+      }
+    },
+    {
+      "type": "video",
+      "src": "media/behance/sonar-park/item_06.mp4",
+      "poster": "media/behance/sonar-park/item_06.poster.jpg",
+      "w": 720,
+      "h": 720,
+      "caption": {
+        "es": "Visual Base Sónar Park — Loop 06",
+        "en": "Sónar Park Base Visual — Loop 06"
+      }
+    },
+    {
+      "type": "image",
+      "src": "media/pixelmaps/peterblue-pxmap.jpg",
+      "poster": "media/pixelmaps/peterblue-pxmap.jpg",
+      "w": 1024,
+      "h": 1024,
+      "caption": {
+        "es": "Pixelmap Original — Sónar Park 1024×1024 px",
+        "en": "Original Pixelmap — Sónar Park 1024×1024 px"
+      }
+    }
+  ],
+  "pixelmap": {
+    "rig": "square",
+    "label": "SONAR-SQUARE",
+    "canvas": [
+      1024,
+      1024
+    ],
+    "width": 8.1,
+    "cabinet": 128,
+    "bpm": 180.32,
+    "hardware": "Resolume Arena 7 (DXV3) · 1024×1024 · 4 Layers",
+    "image": "media/pixelmaps/peterblue-pxmap.jpg",
+    "slices": [
+      {
+        "name": {
+          "es": "SLICE 1 · MONOLITO 1:1",
+          "en": "SLICE 1 · 1:1 MONOLITH"
+        },
+        "x": 0,
+        "y": 0,
+        "w": 1024,
+        "h": 1024,
+        "physical": "8.1m × 8.1m"
+      }
+    ],
+    "playlist": [
+      "media/stages/peterblue/square-preview.mp4",
+      "media/stages/peterblue/frases/peterblue_blanco_alpha.mp4",
+      "media/stages/peterblue/frases/peterblue_azul_alpha.mp4",
+      "media/stages/peterblue/frases/dile_que_bailando_te_conoci.mp4",
+      "media/stages/peterblue/frases/donde_estan_las_gatas.mp4",
+      "media/stages/peterblue/frases/el_cuerpo_rozar.mp4",
+      "media/stages/peterblue/frases/ese_culo_esta_bendecido.mp4",
+      "media/stages/peterblue/frases/es_un_llamado_de_emergencia.mp4",
+      "media/stages/peterblue/frases/la_makina_latina.mp4",
+      "media/stages/peterblue/frases/la_makina_latina_2.mp4",
+      "media/stages/peterblue/frases/nadie_me_quita_lo_tumbado.mp4",
+      "media/stages/peterblue/frases/no_puedo_seguir_sufriendo.mp4",
+      "media/stages/peterblue/frases/pa_que_la_pases_bien.mp4",
+      "media/stages/peterblue/frases/peterblue_fondo_azul.mp4",
+      "media/stages/peterblue/frases/peterblue_fondo_blanco.mp4",
+      "media/stages/peterblue/frases/peterblue_horizontal.mp4",
+      "media/stages/peterblue/frases/por_que_te_demoras.mp4",
+      "media/stages/peterblue/frases/salgo_pa_la_calle_sin_rumbo.mp4",
+      "media/stages/peterblue/frases/si_te_quieres_divertir_2.mp4",
+      "media/stages/peterblue/frases/si_te_quieres_divertir_con_encanto.mp4",
+      "media/stages/peterblue/extra/screen-ananay.mp4",
+      "media/stages/peterblue/extra/screen-panteras.mp4",
+      "media/stages/peterblue/extra/screen-raro.mp4",
+      "media/stages/peterblue/extra/screen-stack.mp4"
+    ]
+  }
+}

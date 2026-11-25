@@ -1,0 +1,191 @@
+{
+  "id": "ritvales-2024",
+  "world": "stage",
+  "order": 7,
+  "title": "RITVALES 2024",
+  "year": "2024",
+  "role": {
+    "es": "Visuales de Festival & Stage Design",
+    "en": "Festival Visuals & Stage Design"
+  },
+  "tools": [
+    "Resolume Arena",
+    "After Effects",
+    "Stage Lighting"
+  ],
+  "summary": {
+    "es": "Dirección visual y registro escénico en Festival Ritvales 2024: integración de visuales atmosféricos con iluminación masiva, láseres y arquitectura escenográfica electrónica.",
+    "en": "Visual direction and stage showcase at Ritvales Festival 2024: atmospheric visuals synchronized with massive festival lighting, lasers, and electronic stage architecture."
+  },
+  "poster": "media/behance/ritvales-2024/poster.jpg",
+  "preview": "media/behance/ritvales-2024/preview.mp4",
+  "w": 960,
+  "h": 540,
+  "color": "#9d4edd",
+  "nodeType": "",
+  "liveSet": null,
+  "gallery": [
+    {
+      "type": "video",
+      "src": "media/behance/ritvales-2024/item_01.mp4",
+      "poster": "media/behance/ritvales-2024/item_01.poster.jpg",
+      "w": 1280,
+      "h": 720,
+      "caption": {
+        "es": "",
+        "en": ""
+      }
+    },
+    {
+      "type": "image",
+      "src": "media/behance/ritvales-2024/item_02.jpg",
+      "poster": "media/behance/ritvales-2024/item_02.jpg",
+      "w": 1600,
+      "h": 984,
+      "caption": {
+        "es": "",
+        "en": ""
+      }
+    },
+    {
+      "type": "image",
+      "src": "media/behance/ritvales-2024/item_03.jpg",
+      "poster": "media/behance/ritvales-2024/item_03.jpg",
+      "w": 1575,
+      "h": 2362,
+      "caption": {
+        "es": "",
+        "en": ""
+      }
+    },
+    {
+      "type": "image",
+      "src": "media/behance/ritvales-2024/item_04.jpg",
+      "poster": "media/behance/ritvales-2024/item_04.jpg",
+      "w": 1600,
+      "h": 1066,
+      "caption": {
+        "es": "",
+        "en": ""
+      }
+    },
+    {
+      "type": "image",
+      "src": "media/behance/ritvales-2024/item_05.jpg",
+      "poster": "media/behance/ritvales-2024/item_05.jpg",
+      "w": 1600,
+      "h": 1066,
+      "caption": {
+        "es": "",
+        "en": ""
+      }
+    },
+    {
+      "type": "image",
+      "src": "media/behance/ritvales-2024/item_06.jpg",
+      "poster": "media/behance/ritvales-2024/item_06.jpg",
+      "w": 1600,
+      "h": 1066,
+      "caption": {
+        "es": "",
+        "en": ""
+      }
+    },
+    {
+      "type": "image",
+      "src": "media/behance/ritvales-2024/item_07.jpg",
+      "poster": "media/behance/ritvales-2024/item_07.jpg",
+      "w": 1600,
+      "h": 1066,
+      "caption": {
+        "es": "",
+        "en": ""
+      }
+    },
+    {
+      "type": "image",
+      "src": "media/behance/ritvales-2024/item_08.jpg",
+      "poster": "media/behance/ritvales-2024/item_08.jpg",
+      "w": 1600,
+      "h": 1080,
+      "caption": {
+        "es": "",
+        "en": ""
+      }
+    }
+  ],
+  "pixelmap": {
+    "rig": "festival",
+    "label": "FESTIVAL-WIDE",
+    "canvas": [
+      1920,
+      1080
+    ],
+    "width": 10,
+    "cabinet": 120,
+    "bpm": 128,
+    "hardware": "Resolume Arena · 16:9 + 2× IMAG",
+    "slices": [
+      {
+        "name": {
+          "es": "PANTALLA CENTRAL",
+          "en": "CENTER WALL"
+        },
+        "x": 0,
+        "y": 0,
+        "w": 1920,
+        "h": 1080,
+        "pos": [
+          0,
+          4.5
+        ],
+        "size": [
+          10,
+          5.625
+        ]
+      },
+      {
+        "name": {
+          "es": "IMAG IZQ",
+          "en": "IMAG LEFT"
+        },
+        "x": 640,
+        "y": 0,
+        "w": 640,
+        "h": 1080,
+        "pos": [
+          -8.2,
+          4.1
+        ],
+        "size": [
+          3,
+          5.06
+        ],
+        "ry": 0.35
+      },
+      {
+        "name": {
+          "es": "IMAG DER",
+          "en": "IMAG RIGHT"
+        },
+        "x": 640,
+        "y": 0,
+        "w": 640,
+        "h": 1080,
+        "pos": [
+          8.2,
+          4.1
+        ],
+        "size": [
+          3,
+          5.06
+        ],
+        "ry": -0.35
+      }
+    ],
+    "playlist": [
+      "media/behance/ritvales-2024/preview.mp4",
+      "media/behance/ritvales-2024/item_01.mp4"
+    ]
+  }
+}
