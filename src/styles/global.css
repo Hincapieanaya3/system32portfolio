@@ -338,7 +338,7 @@ body,
 .hero-hub {
   position: relative;
   width: 100%;
-  height: 100vh;
+  height: 100dvh;
   overflow: hidden;
 }
 
@@ -363,7 +363,7 @@ body,
   z-index: 10;
   width: 100%;
   height: 100%;
-  padding: 68px 28px 18px;
+  padding: 64px 28px clamp(44px, 7vh, 76px);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -541,7 +541,8 @@ body,
 
 .portal-card {
   position: relative;
-  height: clamp(170px, 22.5vh, 244px);
+  min-height: clamp(192px, 24.5vh, 244px);
+  height: auto;
   border-radius: 12px;
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.13);
@@ -550,7 +551,8 @@ body,
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 13px 15px;
+  gap: 12px;
+  padding: 13px 15px 14px;
   text-align: left;
   color: #fff;
   transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease, box-shadow 0.35s ease;
@@ -1341,7 +1343,8 @@ body,
     overflow-y: auto;
   }
   .portal-card {
-    height: 175px;
+    min-height: 188px;
+    height: auto;
   }
   .games-side-panel {
     top: 104px;
