@@ -44,9 +44,11 @@ export function stageMarkup(pm, { label } = {}) {
   const items = multi ? pm.scenes : pm.playlist;
   const thumb = (it) => asset(posterOf(multi ? it.sources.central || Object.values(it.sources)[0] : it));
   return `
-  <div class="stage-gl" data-cursor="DRAG"></div>
-  <div class="cad-tags" aria-hidden="true">
-    ${pm.slices.map((s, i) => `<button type="button" class="cad-tag mono" data-i="${i}"><b>${tr(s.name)}</b> ${s.w}×${s.h}${s.physical ? ' · ' + s.physical : ''}</button>`).join('')}
+  <div class="stage-view">
+    <div class="stage-gl" data-cursor="DRAG"></div>
+    <div class="cad-tags" aria-hidden="true">
+      ${pm.slices.map((s, i) => `<button type="button" class="cad-tag mono" data-i="${i}"><b>${tr(s.name)}</b> ${s.w}×${s.h}${s.physical ? ' · ' + s.physical : ''}</button>`).join('')}
+    </div>
   </div>
   <div class="stage-hud">
     <p class="mono stage-tag"><i class="rec"></i>RIG: ${pm.label} // ${cw}×${ch}px // ${pm.slices.length} SLICE${pm.slices.length > 1 ? 'S' : ''}${label ? ' — ' + label : ''}</p>
@@ -191,8 +193,13 @@ export function mountStage(root, pm, title = '') {
         b.classList.toggle('on', s === phase);
         b.classList.toggle('done', s < phase);
       });
-      aside.classList.remove('off');
-      mapBtn.classList.add('on');
+      if (innerWidth > 760) {
+        aside.classList.remove('off');
+        mapBtn.classList.add('on');
+      } else {
+        aside.classList.add('off');
+        mapBtn.classList.remove('on');
+      }
       setPxMode(phase < 4 ? 'tpl' : 'live');
     } else {
       stopAutoBuild();

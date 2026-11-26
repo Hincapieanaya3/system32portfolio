@@ -158,11 +158,11 @@ export class LedWall {
     let fs = 100;
     ctx.font = `900 ${fs}px Archivo`;
     const widest = Math.max(...lines.map((l) => ctx.measureText(l).width));
-    const target = c.width * (narrow ? 0.86 : 0.9);
-    fs = Math.min((fs * target) / widest, (c.height * 0.72) / (lines.length * 0.86));
+    const target = c.width * (narrow ? 0.72 : 0.9);
+    fs = Math.min((fs * target) / widest, (c.height * (narrow ? 0.44 : 0.72)) / (lines.length * 0.86));
     ctx.font = `900 ${fs}px Archivo`;
     const lh = fs * 0.86;
-    const y0 = c.height * (narrow ? 0.46 : 0.47) - ((lines.length - 1) * lh) / 2;
+    const y0 = c.height * (narrow ? 0.34 : 0.47) - ((lines.length - 1) * lh) / 2;
     lines.forEach((l, i) => ctx.fillText(l, c.width / 2, y0 + i * lh));
     this.maskTex.needsUpdate = true;
   }
