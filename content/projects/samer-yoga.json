@@ -1,0 +1,41 @@
+{
+  "id": "samer-yoga",
+  "world": "motion",
+  "order": 103,
+  "title": "SAMER YOGA - EL SOL SALE PARA TODOS",
+  "year": "2025",
+  "role": {
+    "es": "Dirección de Animación & Motion",
+    "en": "Animation Direction & Motion"
+  },
+  "tools": [
+    "Adobe After Effects",
+    "Motion Graphics",
+    "Sound Sync"
+  ],
+  "summary": {
+    "es": "Pieza audiovisual de campaña con narrativa cálida, composición orgánica y animaciones fluidas diseñadas para transmitir calma y luminosidad.",
+    "en": "Warm campaign motion piece featuring organic composition and fluid animation crafted to convey calm and radiance."
+  },
+  "poster": "media/behance/samer-yoga/poster.jpg",
+  "preview": "media/behance/samer-yoga/preview.mp4",
+  "w": 960,
+  "h": 1706,
+  "color": "#0096ff",
+  "nodeType": "",
+  "liveSet": null,
+  "gallery": [
+    {
+      "type": "video",
+      "src": "media/behance/samer-yoga/item_01.mp4",
+      "poster": "media/behance/samer-yoga/item_01.poster.jpg",
+      "w": 1080,
+      "h": 1920,
+      "caption": {
+        "es": "",
+        "en": ""
+      }
+    }
+  ],
+  "pixelmap": null
+}

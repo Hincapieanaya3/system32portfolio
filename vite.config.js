@@ -1,11 +1,8 @@
 import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
 
+// base relativa: funciona igual en localhost y en GitHub Pages (usuario.github.io/repo/)
 export default defineConfig({
-  base: process.env.GITHUB_PAGES === 'true' ? '/system32portfolio/' : '/',
-  plugins: [react()],
-  server: {
-    port: 5173,
-    host: true,
-  },
+  base: './',
+  server: { port: 5232, host: true },
+  build: { chunkSizeWarningLimit: 1200 },
 });
