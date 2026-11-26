@@ -5,8 +5,7 @@
 //   multi           → cada pantalla tiene su propio video (pos/size en metros, fuente "src")
 //   curved          → el lienzo se dobla en un arco (pared panorámica en S)
 //   festival        → pantalla central + laterales IMAG (pos/size/ry explícitos)
-// Alrededor: truss, cabezas móviles que toman el color del contenido, humo, público
-// que salta al BPM y piso reflectivo.
+// Incluye modo STAGE BUILD 2D→3D en 4 fases (CAD Exploded, Pixelmap Slices, Rig & Beams, Live Show).
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
@@ -19,14 +18,20 @@ import { beat } from '../ui/beat.js';
 import { asset } from '../data.js';
 
 const WHITE = new THREE.Color(1, 1, 1);
+const BG_CONCERT = new THREE.Color(0x050506);
+const BG_CAD = new THREE.Color(0x040b15);
+
 const ledVert = /* glsl */ `varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`;
 const ledFrag = /* glsl */ `
-uniform sampler2D map; uniform vec4 rect; uniform vec2 px; uniform float cab;
-uniform float uTime; uniform float uGlitch; uniform float uStrobe; uniform float uHover; uniform float uOn; uniform float uReady;
+uniform sampler2D map; uniform sampler2D tplMap;
+uniform vec4 rect; uniform vec4 tplRect; uniform vec2 px; uniform float cab;
+uniform float uTime; uniform float uGlitch; uniform float uStrobe; uniform float uHover;
+uniform float uOn; uniform float uReady; uniform float uUseTpl; uniform float uAlpha;
 varying vec2 vUv;
 float hash(vec2 p){ return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }
 void main(){
   vec2 uv = rect.xy + vUv * rect.zw;
+  vec2 tuv = tplRect.xy + vUv * tplRect.zw;
   float row = floor(vUv.y * 40.0);
   float gl = uGlitch * (hash(vec2(row, floor(uTime * 30.0))) - 0.5) * 0.25;
   vec3 c;
@@ -37,6 +42,9 @@ void main(){
   vec2 ck = floor(vUv * px / 64.0);
   vec3 test = mix(vec3(0.07), vec3(0.16), mod(ck.x + ck.y, 2.0));
   c = mix(test, c, uReady);
+  // proyección del pixelmap 2D real durante Stage Build (Fases 1-3)
+  vec3 tplC = texture2D(tplMap, tuv).rgb;
+  c = mix(c, tplC, uUseTpl);
   vec2 p = vUv * px;
   vec2 f = abs(fract(p) - 0.5);
   vec2 w = fwidth(p);
@@ -50,8 +58,8 @@ void main(){
   c *= 1.0 - 0.55 * seam;
   c = mix(c, abs(vec3(1.0) - c), uStrobe);
   c *= uOn;
-  c += vec3(1.0, 0.29, 0.11) * uHover * 0.18;
-  gl_FragColor = vec4(c * 0.92, 1.0);
+  c += mix(vec3(1.0, 0.29, 0.11), vec3(0.0, 0.9, 1.0), uUseTpl) * uHover * 0.24;
+  gl_FragColor = vec4(c * 0.94, uAlpha);
 }`;
 
 const beamVert = /* glsl */ `
@@ -79,6 +87,40 @@ function spriteTexture() {
   grd.addColorStop(0, 'rgba(255,255,255,1)'); grd.addColorStop(1, 'rgba(255,255,255,0)');
   g.fillStyle = grd; g.fillRect(0, 0, 64, 64);
   return new THREE.CanvasTexture(c);
+}
+
+function makeFallbackTemplateTex(pm) {
+  const c = document.createElement('canvas');
+  const [cw, ch] = pm.canvas;
+  c.width = 512;
+  c.height = Math.max(128, Math.round((512 * ch) / cw));
+  const g = c.getContext('2d');
+  const kx = c.width / cw;
+  const ky = c.height / ch;
+  g.fillStyle = '#070b14';
+  g.fillRect(0, 0, c.width, c.height);
+  const colors = ['#00e5ff', '#ff4a1c', '#b69cff', '#4df5c1', '#ffd23f'];
+  pm.slices.forEach((s, idx) => {
+    const x = s.x * kx, y = s.y * ky, w = s.w * kx, h = s.h * ky;
+    g.fillStyle = idx % 2 ? '#0e1726' : '#121d2f';
+    g.fillRect(x, y, w, h);
+    g.strokeStyle = colors[idx % colors.length];
+    g.lineWidth = 3;
+    g.strokeRect(x + 1.5, y + 1.5, w - 3, h - 3);
+    g.beginPath();
+    g.moveTo(x, y); g.lineTo(x + w, y + h);
+    g.moveTo(x + w, y); g.lineTo(x, y + h);
+    g.strokeStyle = 'rgba(0,229,255,0.28)';
+    g.lineWidth = 1;
+    g.stroke();
+    g.fillStyle = '#ffffff';
+    g.font = '700 18px monospace';
+    g.textAlign = 'center';
+    g.fillText(`${s.w}x${s.h}`, x + w / 2, y + h / 2 + 6);
+  });
+  const tex = new THREE.CanvasTexture(c);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  return tex;
 }
 
 function trussGeometry(length, size = 0.3, r = 0.022) {
@@ -125,10 +167,12 @@ const QUALITY = [
 let qLevel = 0;
 
 export class Stage {
-  constructor(container, pm, { onClip, onHoverSlice } = {}) {
+  constructor(container, pm, { onClip, onHoverSlice, onProjectLabels } = {}) {
     this.container = container;
     this.pm = pm;
-    this.onClip = onClip; this.onHoverSlice = onHoverSlice;
+    this.onClip = onClip;
+    this.onHoverSlice = onHoverSlice;
+    this.onProjectLabels = onProjectLabels;
     this.items = pm.scenes?.length ? pm.scenes : (pm.playlist || []);
     this.multi = !!pm.scenes?.length;
     this.clip = 0;
@@ -137,6 +181,14 @@ export class Stage {
     this.glitch = 0;
     this.slicesHover = -1;
 
+    // Estado de Stage Build 2D→3D (4 fases)
+    this.buildOpen = false;
+    this.buildPhase = 4;
+    this.explodeMix = 0;
+    this.cadMix = 0;
+    this.tplMix = 0;
+    this.beamsMix = 1;
+
     const renderer = (this.renderer = new THREE.WebGLRenderer({ antialias: false, powerPreference: 'high-performance', stencil: false }));
     renderer.setPixelRatio(Math.min(devicePixelRatio, QUALITY[qLevel].pr));
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -144,8 +196,17 @@ export class Stage {
     container.appendChild(renderer.domElement);
 
     const scene = (this.scene = new THREE.Scene());
-    scene.background = new THREE.Color(0x050506);
+    scene.background = BG_CONCERT.clone();
     scene.fog = new THREE.FogExp2(0x050506, 0.022);
+
+    // Textura de carta de calibración / pixelmap 2D para Stage Build
+    if (pm.image) {
+      this.tplTex = new THREE.TextureLoader().load(asset(pm.image));
+      this.tplTex.colorSpace = THREE.SRGBColorSpace;
+      this.tplTex.minFilter = THREE.LinearFilter;
+    } else {
+      this.tplTex = makeFallbackTemplateTex(pm);
+    }
 
     // ---- videos: uno compartido, o uno por fuente en rigs multi-pantalla
     this.sources = {};
@@ -158,26 +219,37 @@ export class Stage {
     this.video.addEventListener('ended', () => this.autopilot && this.next());
     Object.values(this.sources).forEach(({ v }) => v.addEventListener('loadeddata', () => (this.readyCount = (this.readyCount || 0) + 1)));
 
-    // ---- pantallas
+    // ---- pantallas + gabinetes + wireframes CAD + líneas guía explosionadas
     const [cw, ch] = pm.canvas;
     const s = (this.s = (pm.width || 6) / cw);
     const bottom = 1.6;
     this.screens = [];
+    this.sliceParts = [];
     const cab = pm.cabinet || 128;
-    const backMat = new THREE.MeshStandardMaterial({ color: 0x0c0c0e, roughness: 0.6, metalness: 0.6 });
+    const backMat = new THREE.MeshStandardMaterial({ color: 0x0c0e14, roughness: 0.55, metalness: 0.65 });
     const box = new THREE.Box3();
     const R = pm.rig === 'curved' ? (cw * s) / (pm.curve || 1.2) : 0;
+    const sliceColors = [0x00e5ff, 0xff4a1c, 0xb69cff, 0x4df5c1, 0xffd23f];
+
     pm.slices.forEach((sl, i) => {
       const tex = this.sources[this.multi ? sl.src : 'main'].tex;
-      const rect = this.multi ? new THREE.Vector4(0, 0, 1, 1) : new THREE.Vector4(sl.x / cw, 1 - (sl.y + sl.h) / ch, sl.w / cw, sl.h / ch);
+      const tplRect = new THREE.Vector4(sl.x / cw, 1 - (sl.y + sl.h) / ch, sl.w / cw, sl.h / ch);
+      const rect = this.multi ? new THREE.Vector4(0, 0, 1, 1) : tplRect.clone();
       const uniforms = {
-        map: { value: tex }, rect: { value: rect }, px: { value: new THREE.Vector2(sl.w, sl.h) }, cab: { value: cab },
-        uTime: { value: 0 }, uGlitch: { value: 0 }, uStrobe: { value: 0 }, uHover: { value: 0 }, uOn: { value: 0 }, uReady: { value: 0 },
+        map: { value: tex }, tplMap: { value: this.tplTex },
+        rect: { value: rect }, tplRect: { value: tplRect },
+        px: { value: new THREE.Vector2(sl.w, sl.h) }, cab: { value: cab },
+        uTime: { value: 0 }, uGlitch: { value: 0 }, uStrobe: { value: 0 },
+        uHover: { value: 0 }, uOn: { value: 0 }, uReady: { value: 0 },
+        uUseTpl: { value: 0 }, uAlpha: { value: 1 },
       };
-      const mat = new THREE.ShaderMaterial({ vertexShader: ledVert, fragmentShader: ledFrag, uniforms, toneMapped: false, side: THREE.DoubleSide });
-      let mesh, back;
+      const mat = new THREE.ShaderMaterial({
+        vertexShader: ledVert, fragmentShader: ledFrag, uniforms,
+        toneMapped: false, transparent: true, side: THREE.DoubleSide,
+      });
+
+      let mesh, back, wireGeo, centerLocal;
       if (pm.rig === 'curved') {
-        // strip curvo: cada vértice se dobla sobre un arco de radio R (alas hacia el público)
         const w = sl.w * s, h = sl.h * s;
         const segs = Math.max(4, Math.round((sl.w / cw) * 64));
         const geo = new THREE.PlaneGeometry(w, h, segs, 1);
@@ -193,6 +265,9 @@ export class Stage {
         mesh = new THREE.Mesh(geo, mat);
         back = new THREE.Mesh(geo.clone(), backMat);
         back.position.z = -0.12;
+        geo.computeBoundingBox();
+        centerLocal = geo.boundingBox.getCenter(new THREE.Vector3());
+        wireGeo = new THREE.EdgesGeometry(geo, 18);
       } else {
         const w = sl.size ? sl.size[0] : sl.w * s;
         const h = sl.size ? sl.size[1] : sl.h * s;
@@ -205,11 +280,31 @@ export class Stage {
         back = new THREE.Mesh(new THREE.BoxGeometry(w + 0.08, h + 0.08, 0.16), backMat);
         back.position.set(x, y, z - 0.09);
         back.rotation.y = mesh.rotation.y;
+        centerLocal = new THREE.Vector3(0, 0, 0);
+        wireGeo = new THREE.EdgesGeometry(new THREE.BoxGeometry(w + 0.12, h + 0.12, 0.2));
       }
+
+      const wireMat = new THREE.LineBasicMaterial({
+        color: sliceColors[i % sliceColors.length],
+        transparent: true,
+        opacity: 0,
+      });
+      const wire = new THREE.LineSegments(wireGeo, wireMat);
+      mesh.add(wire);
+
       mesh.userData.slice = i;
       scene.add(mesh); scene.add(back);
       box.expandByObject(mesh);
       this.screens.push(mesh);
+
+      const basePos = mesh.position.clone();
+      const backBasePos = back.position.clone();
+      this.sliceParts.push({
+        mesh, back, wire, wireMat, centerLocal, sliceIdx: i, slice: sl,
+        basePos, backBasePos,
+        expPos: basePos.clone(),
+        backExpPos: backBasePos.clone(),
+      });
     });
 
     const minX = box.min.x, maxX = box.max.x, topY = box.max.y;
@@ -218,7 +313,39 @@ export class Stage {
     this.screenCenter = new THREE.Vector3(cx, (bottom + topY) / 2, 0);
     this.dims = { W, H: topY - bottom, bottom };
 
-    // ---- truss
+    // Calcular vectores de explosión CAD + líneas guía punteadas para cada slice
+    this.sliceParts.forEach((p, i) => {
+      const worldCenter = p.basePos.clone().add(p.centerLocal);
+      const dx = (worldCenter.x - cx) * 0.24;
+      const dy = (worldCenter.y - this.screenCenter.y) * 0.16 + 0.18;
+      const dz = 1.65 + i * 0.42;
+      p.expPos.set(p.basePos.x + dx, p.basePos.y + dy, p.basePos.z + dz);
+      p.backExpPos.set(p.backBasePos.x + dx * 0.35, p.backBasePos.y + dy * 0.35, p.backBasePos.z - 1.35);
+
+      const pts = new Float32Array([
+        worldCenter.x, worldCenter.y, worldCenter.z - 1.35,
+        worldCenter.x, worldCenter.y, worldCenter.z,
+      ]);
+      const lGeo = new THREE.BufferGeometry();
+      lGeo.setAttribute('position', new THREE.BufferAttribute(pts, 3));
+      const lMat = new THREE.LineDashedMaterial({
+        color: sliceColors[i % sliceColors.length],
+        dashSize: 0.22,
+        gapSize: 0.14,
+        transparent: true,
+        opacity: 0,
+      });
+      const leader = new THREE.Line(lGeo, lMat);
+      leader.visible = false;
+      scene.add(leader);
+      p.leader = leader;
+      p.leaderGeo = lGeo;
+      p.leaderMat = lMat;
+      p.worldAnchor = worldCenter.clone();
+    });
+
+    // ---- truss (agrupado para elevarse en Fase 1 CAD Exploded)
+    this.trussGroup = new THREE.Group();
     const trussMat = new THREE.MeshStandardMaterial({ color: 0x9a9aa2, roughness: 0.35, metalness: 0.9 });
     const span = W + 3.2;
     const towerH = topY + 1.4;
@@ -227,29 +354,40 @@ export class Stage {
       for (const sx of [-1, 1]) {
         const t = new THREE.Mesh(trussGeometry(towerH), trussMat);
         t.position.set(cx + (sx * span) / 2, 0, z);
-        scene.add(t);
+        this.trussGroup.add(t);
       }
       const top = new THREE.Mesh(trussGeometry(span + 0.3), trussMat);
       top.rotation.z = Math.PI / 2;
       top.position.set(cx + span / 2 + 0.15, towerH, z);
-      scene.add(top);
+      this.trussGroup.add(top);
     }
+    scene.add(this.trussGroup);
 
-    // ---- tarima y cabina
+    // ---- tarima y cabina (agrupadas para desplazarse en Fase 1)
+    this.deckGroup = new THREE.Group();
     const deckMat = new THREE.MeshStandardMaterial({ color: 0x111114, roughness: 0.8, metalness: 0.2 });
     const deckD = pm.rig === 'curved' ? 7 : 5.2;
     const deck = new THREE.Mesh(new THREE.BoxGeometry(span + 1.5, 1.1, deckD), deckMat);
     deck.position.set(cx, 0.55, 1.3 + (deckD - 5.2) / 2);
-    scene.add(deck);
+    this.deckGroup.add(deck);
     const booth = new THREE.Mesh(new THREE.BoxGeometry(2.6, 1.05, 0.9), deckMat);
     booth.position.set(cx, 1.1 + 0.52, 2.2);
-    scene.add(booth);
+    this.deckGroup.add(booth);
     this.boothStrip = new THREE.Mesh(new THREE.PlaneGeometry(2.5, 0.06), new THREE.MeshBasicMaterial({ color: 0xff4a1c, toneMapped: false }));
     this.boothStrip.position.set(cx, 1.1 + 0.85, 2.66);
-    scene.add(this.boothStrip);
+    this.deckGroup.add(this.boothStrip);
     this.deckStrip = new THREE.Mesh(new THREE.PlaneGeometry(span + 1.5, 0.05), new THREE.MeshBasicMaterial({ color: 0xffffff, toneMapped: false }));
     this.deckStrip.position.set(cx, 1.08, 1.3 + deckD / 2 + 0.01 + (deckD - 5.2) / 2);
-    scene.add(this.deckStrip);
+    this.deckGroup.add(this.deckStrip);
+    scene.add(this.deckGroup);
+
+    // ---- rejilla CAD blueprint (visible en Fases 1-2 de Stage Build)
+    this.cadGrid = new THREE.GridHelper(70, 56, 0x00e5ff, 0x0c2b44);
+    this.cadGrid.position.set(cx, 0.018, 0);
+    this.cadGrid.material.transparent = true;
+    this.cadGrid.material.opacity = 0;
+    this.cadGrid.visible = false;
+    scene.add(this.cadGrid);
 
     // ---- piso reflectivo atenuado
     const mirror = new Reflector(new THREE.PlaneGeometry(120, 120), {
@@ -258,7 +396,6 @@ export class Stage {
     mirror.rotation.x = -Math.PI / 2;
     scene.add(mirror);
     this.mirror = mirror;
-    // el reflejo se recalcula cada 2 cuadros (casi no se nota y ahorra un render completo)
     const mirrorRender = mirror.onBeforeRender;
     this.frame = 0;
     mirror.onBeforeRender = (...a) => { if (this.frame % 2 === 0) mirrorRender.apply(mirror, a); };
@@ -299,7 +436,7 @@ export class Stage {
       pivot.position.set(cx - span / 2 + 0.6 + (i * (span - 1.2)) / (nBeams - 1), towerH - 0.35, 3.6);
       const mat = beamMat(0.15);
       pivot.add(new THREE.Mesh(coneG, mat)); pivot.add(new THREE.Mesh(fixtureG, fixtureM));
-      scene.add(pivot);
+      this.trussGroup.add(pivot);
       this.beams.push({ pivot, mat, ph: i / nBeams, side: i < nBeams / 2 ? -1 : 1 });
     }
     for (const sx of [-1, 1]) for (let k = 0; k < 2; k++) {
@@ -319,7 +456,9 @@ export class Stage {
     this.haze = new THREE.Points(hazeG, new THREE.PointsMaterial({ size: 2.6, map: spriteTexture(), transparent: true, opacity: 0.03, depthWrite: false, blending: THREE.AdditiveBlending }));
     scene.add(this.haze);
 
-    scene.add(new THREE.HemisphereLight(0x8890ff, 0x050505, 0.25));
+    scene.add(new THREE.HemisphereLight(0x8890ff, 0x050505, 0.28));
+    this.cadHemi = new THREE.HemisphereLight(0x8be9fd, 0x0a1c2e, 0);
+    scene.add(this.cadHemi);
     this.screenLight = new THREE.PointLight(0xffffff, 18, 34, 1.6);
     this.screenLight.position.set(cx, this.screenCenter.y, 3);
     scene.add(this.screenLight);
@@ -333,6 +472,11 @@ export class Stage {
       wide: { pos: new THREE.Vector3(cx + dist * 0.3, this.screenCenter.y * 0.65, dist), tgt },
       stage: { pos: new THREE.Vector3(cx - size * 0.12, this.screenCenter.y * 0.85, size * 0.62 + 4), tgt: this.screenCenter.clone() },
       booth: { pos: new THREE.Vector3(cx + 1.2, 3.3, front + 13), tgt: this.screenCenter.clone().add(new THREE.Vector3(0, -0.8, 0)) },
+      // Presets coreografiados para Stage Build 2D→3D (isométrico CAD → ensamblaje → luces → live)
+      build1: { pos: new THREE.Vector3(cx + dist * 0.56, this.screenCenter.y + dist * 0.34, dist * 1.12), tgt: this.screenCenter.clone().add(new THREE.Vector3(-dist * 0.08, 0.1, 0.3)) },
+      build2: { pos: new THREE.Vector3(cx + dist * 0.28, this.screenCenter.y + dist * 0.14, dist * 1.06), tgt: this.screenCenter.clone().add(new THREE.Vector3(-dist * 0.06, 0, 0)) },
+      build3: { pos: new THREE.Vector3(cx - dist * 0.3, this.screenCenter.y + dist * 0.1, dist * 1.06), tgt: this.screenCenter.clone().add(new THREE.Vector3(-dist * 0.05, 0, 0)) },
+      build4: { pos: new THREE.Vector3(cx + dist * 0.24, this.screenCenter.y * 0.72, dist), tgt },
     };
     cam.position.copy(this.presets.wide.pos);
     const controls = (this.controls = new OrbitControls(cam, renderer.domElement));
@@ -340,13 +484,13 @@ export class Stage {
     controls.enableDamping = true; controls.dampingFactor = 0.06;
     controls.enablePan = false; controls.enableZoom = false;
     controls.minDistance = 4; controls.maxDistance = dist * 1.9;
-    controls.minPolarAngle = 0.35; controls.maxPolarAngle = 1.56;
-    controls.minAzimuthAngle = -1.2; controls.maxAzimuthAngle = 1.2;
+    controls.minPolarAngle = 0.28; controls.maxPolarAngle = 1.56;
+    controls.minAzimuthAngle = -1.4; controls.maxAzimuthAngle = 1.4;
     controls.autoRotate = true; controls.autoRotateSpeed = 0.3;
     controls.addEventListener('start', () => { controls.autoRotate = false; this.camAnim = null; clearTimeout(this.idleT); });
-    controls.addEventListener('end', () => { this.idleT = setTimeout(() => (controls.autoRotate = true), 6000); });
+    controls.addEventListener('end', () => { this.idleT = setTimeout(() => { if (!this.buildOpen) controls.autoRotate = true; }, 6000); });
     this.onWheel = (e) => {
-      if (!(e.ctrlKey || e.metaKey)) return;
+      if (!(e.ctrlKey || e.metaKey || this.buildOpen)) return;
       e.preventDefault();
       const dir = cam.position.clone().sub(controls.target);
       const len = THREE.MathUtils.clamp(dir.length() * (1 + Math.sign(e.deltaY) * 0.08), controls.minDistance, controls.maxDistance);
@@ -368,6 +512,7 @@ export class Stage {
     this.avgTarget = new THREE.Color(1, 0.3, 0.1);
     this.avgLight = new THREE.Color();
     this.hitSlice = -1;
+    this._projVec = new THREE.Vector3();
 
     this.ray = new THREE.Raycaster();
     this.pointer = new THREE.Vector2(9, 9);
@@ -423,13 +568,26 @@ export class Stage {
   setAutopilot(on) { this.autopilot = on; this.video.loop = !on; }
   setStrobe(on) { this.strobeHeld = on; }
   highlight(i) { this.forcedHover = i; }
+
+  setBuildMode(open, phase = 1) {
+    this.buildOpen = open;
+    this.buildPhase = open ? phase : 4;
+    if (open) {
+      this.setView(`build${phase}`);
+    } else {
+      this.setView('wide');
+    }
+  }
+
   setView(name) {
     const p = this.presets[name];
     if (!p) return;
     this.controls.autoRotate = false;
     clearTimeout(this.idleT);
     this.camAnim = { from: this.camera.position.clone(), fromT: this.controls.target.clone(), to: p.pos, toT: p.tgt, t: 0 };
-    this.idleT = setTimeout(() => (this.controls.autoRotate = true), 9000);
+    if (!this.buildOpen) {
+      this.idleT = setTimeout(() => (this.controls.autoRotate = true), 9000);
+    }
   }
 
   resize() {
@@ -461,7 +619,6 @@ export class Stage {
     } catch { /* sin cuadros todavía */ }
   }
 
-  // mide el tiempo por cuadro y baja la calidad si el equipo no da ~45 fps
   adapt(now) {
     const dt = now - (this.lastNow || now);
     this.lastNow = now;
@@ -496,16 +653,39 @@ export class Stage {
     this.strobe = this.strobeHeld ? (ph < 0.5 ? 1 : 0) : 0;
     this.on += (1 - this.on) * 0.03;
 
+    // ---- Interpolación suave de Stage Build (4 fases)
+    const tgtExplode = this.buildOpen && this.buildPhase === 1 ? 1 : 0;
+    const tgtCad = this.buildOpen && this.buildPhase <= 2 ? 1 : 0;
+    const tgtTpl = this.buildOpen && this.buildPhase < 4 ? 1 : 0;
+    const tgtBeams = !this.buildOpen || this.buildPhase >= 3 ? 1 : 0;
+
+    this.explodeMix += (tgtExplode - this.explodeMix) * 0.085;
+    this.cadMix += (tgtCad - this.cadMix) * 0.09;
+    this.tplMix += (tgtTpl - this.tplMix) * 0.1;
+    this.beamsMix += (tgtBeams - this.beamsMix) * 0.09;
+
+    // Atmósfera CAD vs Concierto
+    this.scene.background.lerpColors(BG_CONCERT, BG_CAD, this.cadMix);
+    this.scene.fog.color.copy(this.scene.background);
+    this.cadHemi.intensity = this.cadMix * 1.95;
+    this.cadGrid.visible = this.cadMix > 0.02;
+    this.cadGrid.material.opacity = this.cadMix * 0.55;
+    this.crowd.visible = this.beamsMix > 0.15;
+    this.haze.visible = this.beamsMix > 0.15;
+
+    // Explosión estructural de Truss, Deck y Slices LED/Gabinetes
+    this.trussGroup.position.set(0, this.explodeMix * 1.45, -this.explodeMix * 1.25);
+    this.deckGroup.position.set(0, -this.explodeMix * 0.15, this.explodeMix * 1.15);
+
     if (this.camAnim) {
       const a = this.camAnim;
-      a.t = Math.min(1, a.t + 0.018);
+      a.t = Math.min(1, a.t + 0.024);
       const k = 1 - Math.pow(1 - a.t, 3);
       this.camera.position.lerpVectors(a.from, a.to, k);
       this.controls.target.lerpVectors(a.fromT, a.toT, k);
       if (a.t >= 1) this.camAnim = null;
     }
 
-    // raycast solo si el puntero o la cámara se movieron
     if (this.pointerDirty || (this.pointer.x < 2 && this.frame % 6 === 0)) {
       this.pointerDirty = false;
       this.ray.setFromCamera(this.pointer, this.camera);
@@ -514,12 +694,40 @@ export class Stage {
     }
     const hi = this.hitSlice >= 0 ? this.hitSlice : this.forcedHover ?? -1;
     if (hi !== this.slicesHover) { this.slicesHover = hi; this.onHoverSlice?.(hi); }
-    this.screens.forEach((m, i) => {
-      const u = m.material.uniforms;
+
+    const e = this.explodeMix;
+    this.sliceParts.forEach((p, i) => {
+      p.mesh.position.lerpVectors(p.basePos, p.expPos, e);
+      p.back.position.lerpVectors(p.backBasePos, p.backExpPos, e);
+
+      const u = p.mesh.material.uniforms;
       const v = this.videoFor(this.pm.slices[i]);
-      u.uTime.value = t; u.uGlitch.value = this.glitch; u.uStrobe.value = this.strobe; u.uOn.value = this.on;
+      u.uTime.value = t;
+      u.uGlitch.value = this.glitch;
+      u.uStrobe.value = this.strobe;
+      u.uOn.value = this.on;
       u.uReady.value += ((v.readyState >= 2 ? 1 : 0) - u.uReady.value) * 0.1;
       u.uHover.value += ((i === hi ? 1 : 0) - u.uHover.value) * 0.15;
+      u.uUseTpl.value = this.tplMix;
+      u.uAlpha.value = 1 - e * 0.12;
+
+      const isHov = i === hi;
+      const wireOp = isHov ? 0.95 : this.cadMix * 0.65;
+      p.wire.visible = wireOp > 0.02;
+      p.wireMat.opacity = wireOp;
+
+      const showLeader = e > 0.04;
+      p.leader.visible = showLeader;
+      if (showLeader) {
+        const arr = p.leaderGeo.attributes.position.array;
+        const backC = p.back.position.clone().add(p.centerLocal);
+        const frontC = p.mesh.position.clone().add(p.centerLocal);
+        arr[0] = backC.x; arr[1] = backC.y; arr[2] = backC.z;
+        arr[3] = frontC.x; arr[4] = frontC.y; arr[5] = frontC.z;
+        p.leaderGeo.attributes.position.needsUpdate = true;
+        p.leader.computeLineDistances();
+        p.leaderMat.opacity = Math.min(0.85, e * (isHov ? 1.0 : 0.72));
+      }
     });
 
     this.avgLight.copy(this.avg).lerp(WHITE, 0.35);
@@ -528,29 +736,53 @@ export class Stage {
       if (b.up) { b.pivot.rotation.z = b.side * (0.25 + Math.sin(a) * 0.22); b.pivot.rotation.x = 0.2 + Math.cos(a * 0.7) * 0.12; }
       else { b.pivot.rotation.z = Math.sin(a) * 0.55 + b.side * 0.1; b.pivot.rotation.x = -0.25 + Math.cos(a * 0.8) * 0.45; }
       b.mat.uniforms.color.value.copy(i % 2 ? this.avgLight : this.avg);
-      b.mat.uniforms.intensity.value = (b.up ? 0.12 : 0.15) * (0.7 + env * 0.6) + (this.strobe ? 0.15 : 0);
+      b.mat.uniforms.intensity.value = ((b.up ? 0.12 : 0.15) * (0.7 + env * 0.6) + (this.strobe ? 0.15 : 0)) * this.beamsMix;
     });
 
-    const ds = this.dummy;
-    this.crowdData.forEach((p, i) => {
-      ds.position.set(p.x, Math.max(0, Math.sin((ph + p.ph * 0.25) * Math.PI * 2)) * p.amp, p.z);
-      ds.scale.setScalar(p.sc);
-      ds.rotation.y = Math.sin(t * 0.3 + p.ph * 6) * 0.3;
-      ds.updateMatrix();
-      this.crowd.setMatrixAt(i, ds.matrix);
-    });
-    this.crowd.instanceMatrix.needsUpdate = true;
+    if (this.crowd.visible) {
+      const ds = this.dummy;
+      this.crowdData.forEach((p, i) => {
+        ds.position.set(p.x, Math.max(0, Math.sin((ph + p.ph * 0.25) * Math.PI * 2)) * p.amp, p.z);
+        ds.scale.setScalar(p.sc);
+        ds.rotation.y = Math.sin(t * 0.3 + p.ph * 6) * 0.3;
+        ds.updateMatrix();
+        this.crowd.setMatrixAt(i, ds.matrix);
+      });
+      this.crowd.instanceMatrix.needsUpdate = true;
+    }
 
     this.haze.rotation.y = Math.sin(t * 0.05) * 0.08;
     this.haze.material.color.copy(this.avg);
     this.screenLight.color.copy(this.avg);
-    this.screenLight.intensity = (18 + env * 14) * this.on;
+    this.screenLight.intensity = (18 + env * 14) * this.on * (0.4 + 0.6 * this.beamsMix);
     this.boothStrip.material.color.copy(this.avg).multiplyScalar(1.5 + env);
     this.deckStrip.material.color.setScalar(0.3 + env * 1.2);
-    this.bloom.strength = 0.42 + env * 0.18 + this.strobe * 0.3;
+    this.bloom.strength = (0.42 + env * 0.18 + this.strobe * 0.3) * (0.35 + 0.65 * this.beamsMix);
 
     this.controls.update();
     this.composer.render();
+
+    // Proyectar cotas 3D CAD sobre las pantallas durante Stage Build
+    if (this.onProjectLabels) {
+      if (this.buildOpen && this.buildPhase <= 3) {
+        const w = this.container.clientWidth;
+        const h = this.container.clientHeight;
+        const projected = this.sliceParts.map((p) => {
+          this._projVec.copy(p.mesh.position).add(p.centerLocal);
+          this._projVec.project(this.camera);
+          const visible = this._projVec.z < 1 && this._projVec.z > -1;
+          return {
+            i: p.sliceIdx,
+            x: (this._projVec.x * 0.5 + 0.5) * w,
+            y: (-this._projVec.y * 0.5 + 0.5) * h,
+            visible,
+          };
+        });
+        this.onProjectLabels(projected, hi);
+      } else {
+        this.onProjectLabels(null, hi);
+      }
+    }
   }
 
   destroy() {
@@ -559,6 +791,7 @@ export class Stage {
     this.ro.disconnect(); this.io.disconnect();
     this.renderer.domElement.removeEventListener('wheel', this.onWheel);
     Object.values(this.sources).forEach(({ v, tex }) => { v.pause(); v.removeAttribute('src'); v.load(); tex.dispose(); });
+    this.tplTex?.dispose();
     this.controls.dispose();
     this.scene.traverse((o) => { o.geometry?.dispose(); if (o.material) [].concat(o.material).forEach((m) => { m.map?.dispose?.(); m.dispose(); }); });
     this.mirror.getRenderTarget?.().dispose();

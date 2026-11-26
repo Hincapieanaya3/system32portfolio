@@ -95,8 +95,10 @@ export function renderStageWorld(app) {
     scramble(info.querySelector('.w-info-t'), { duration: 500 });
     info.querySelector('.w-info-s').textContent = tr(p.summary);
     info.querySelector('.w-info-cta').innerHTML = `
+      <button type="button" class="pill pill--build" data-open-build><i class="b-dot"></i>${t('stageBuild')}</button>
       <a class="pill pill--fill" href="#/p/${p.id}" data-magnetic="0.2">${t('openGallery')} →</a>
       ${p.liveSet ? `<a class="pill" href="${p.liveSet.url}" target="_blank" rel="noopener">▶ ${tr(p.liveSet.label) || t('liveSet')}</a>` : ''}`;
+    info.querySelector('[data-open-build]')?.addEventListener('click', () => mounted?.toggleBuild());
     setTimeout(updateScroll, 400);
   }
 

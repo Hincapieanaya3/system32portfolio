@@ -1,7 +1,42 @@
 // Escenario 3D con su interfaz: HUD del rig, cámaras, autopilot/strobe, pixel map 2D en
-// vivo enlazado con las pantallas 3D y deck de canales (clips o escenas).
+// vivo enlazado con las pantallas 3D, deck de canales y modo STAGE BUILD 2D→3D en 4 fases.
 import { Stage } from '../gl/stage.js';
 import { t, tr, asset, posterOf, pad } from '../data.js';
+
+const BUILD_PHASES = [
+  {
+    step: 1,
+    short: { es: '01 · CAD EXPLODED', en: '01 · CAD EXPLODED' },
+    desc: {
+      es: 'Trusses, gabinetes y pantallas LED separados en vista explosionada con cotas físicas y líneas guía.',
+      en: 'Trusses, cabinets, and LED panels separated in exploded CAD view with physical dimensions and leader lines.',
+    },
+  },
+  {
+    step: 2,
+    short: { es: '02 · PIXELMAP SLICES', en: '02 · PIXELMAP SLICES' },
+    desc: {
+      es: 'Ensamblaje mecánico proyectando el plano real de cortes de Resolume Advanced Output sobre cada pantalla.',
+      en: 'Mechanical assembly projecting the real Resolume Advanced Output pixelmap calibration grid onto every slice.',
+    },
+  },
+  {
+    step: 3,
+    short: { es: '03 · RIG & BEAMS', en: '03 · RIG & BEAMS' },
+    desc: {
+      es: 'Encendido de iluminación volumétrica, cabezas móviles, humo y público sobre el mapa de calibración.',
+      en: 'Volumetric moving heads, stage haze, and crowd powered on over the active calibration pixelmap.',
+    },
+  },
+  {
+    step: 4,
+    short: { es: '04 · LIVE SHOW', en: '04 · LIVE SHOW' },
+    desc: {
+      es: 'Show final en vivo corriendo los visuales DXV3 sincronizados al BPM en modo Autopilot.',
+      en: 'Final live festival operation streaming synchronized DXV3 visuals in Autopilot mode.',
+    },
+  },
+];
 
 export function stageMarkup(pm, { label } = {}) {
   const [cw, ch] = pm.canvas;
@@ -10,9 +45,13 @@ export function stageMarkup(pm, { label } = {}) {
   const thumb = (it) => asset(posterOf(multi ? it.sources.central || Object.values(it.sources)[0] : it));
   return `
   <div class="stage-gl" data-cursor="DRAG"></div>
+  <div class="cad-tags" aria-hidden="true">
+    ${pm.slices.map((s, i) => `<button type="button" class="cad-tag mono" data-i="${i}"><b>${tr(s.name)}</b> ${s.w}×${s.h}${s.physical ? ' · ' + s.physical : ''}</button>`).join('')}
+  </div>
   <div class="stage-hud">
     <p class="mono stage-tag"><i class="rec"></i>RIG: ${pm.label} // ${cw}×${ch}px // ${pm.slices.length} SLICE${pm.slices.length > 1 ? 'S' : ''}${label ? ' — ' + label : ''}</p>
     <div class="stage-ctrl mono">
+      <button class="sc-build" type="button"><i class="b-dot"></i>${t('stageBuild')}</button>
       <span class="seg">
         <button data-cam="wide" class="on">${t('camWide')}</button><button data-cam="stage">${t('camStage')}</button><button data-cam="booth">${t('camBooth')}</button>
       </span>
@@ -33,6 +72,22 @@ export function stageMarkup(pm, { label } = {}) {
     </div>
     <p class="mono dim pxmap-foot">${pm.hardware || 'Resolume Arena · Advanced Output'}${pm.bpm ? ' · ' + pm.bpm + ' BPM' : ''}</p>
   </aside>
+  <div class="build-dock" hidden>
+    <div class="build-dock-top">
+      <div class="build-readout">
+        <span class="build-badge mono">01 · CAD EXPLODED</span>
+        <span class="build-desc"></span>
+      </div>
+      <div class="build-actions mono">
+        <button type="button" class="bd-auto">${t('autoBuild')}</button>
+        <button type="button" class="bd-next">${t('next')} →</button>
+        <button type="button" class="bd-close">${t('exitBuild')} ✕</button>
+      </div>
+    </div>
+    <div class="build-steps mono">
+      ${BUILD_PHASES.map((p) => `<button type="button" class="bd-step" data-step="${p.step}">${tr(p.short)}</button>`).join('')}
+    </div>
+  </div>
   <div class="deck-wrap"><p class="deck-k mono">${multi ? t('scenes') : t('clips')} <b>${pad(items.length)}</b><span class="dim"> · [ ]</span></p><div class="deck" role="list" aria-label="${multi ? t('scenes') : t('clips')}" data-lenis-prevent>
     ${items.map((it, k) => `<button class="ch" role="listitem" data-k="${k}" data-cursor="CH ${pad(k + 1)}"><img src="${thumb(it)}" alt="" loading="lazy"><span class="mono">${multi ? it.label : 'CH ' + pad(k + 1)}</span></button>`).join('')}
   </div></div>`;
@@ -43,13 +98,29 @@ export function mountStage(root, pm, title = '') {
   const chs = [...root.querySelectorAll('.ch')];
   const svgG = [...root.querySelectorAll('.pxmap-svg .sl')];
   const labels = [...root.querySelectorAll('.sl-label')];
+  const cadTags = [...root.querySelectorAll('.cad-tag')];
   const setHover = (i) => {
     svgG.forEach((g, k) => g.classList.toggle('hl', k === i));
     labels.forEach((l, k) => l.classList.toggle('hl', k === i));
+    cadTags.forEach((c, k) => c.classList.toggle('hl', k === i));
   };
+
   const stage = new Stage(root.querySelector('.stage-gl'), pm, {
     onClip: (k) => chs.forEach((c, j) => { c.classList.toggle('on', j === k); if (j === k) c.scrollIntoView?.({ block: 'nearest', inline: 'nearest', behavior: 'smooth' }); }),
     onHoverSlice: setHover,
+    onProjectLabels: (pts, hi) => {
+      if (!pts) {
+        cadTags.forEach((el) => (el.style.opacity = '0'));
+        return;
+      }
+      pts.forEach((pt) => {
+        const el = cadTags[pt.i];
+        if (!el) return;
+        if (!pt.visible) { el.style.opacity = '0'; return; }
+        el.style.transform = `translate(${pt.x.toFixed(1)}px, ${pt.y.toFixed(1)}px) translate(-50%, -50%)`;
+        el.style.opacity = hi >= 0 && hi !== pt.i ? '0.45' : '1';
+      });
+    },
   });
   chs.forEach((c) => c.addEventListener('click', () => stage.load(+c.dataset.k)));
   if (import.meta.env.DEV) window.__stage = stage;
@@ -66,39 +137,112 @@ export function mountStage(root, pm, title = '') {
   strobe.addEventListener('pointerdown', sOn);
   strobe.addEventListener('pointerup', sOff);
   strobe.addEventListener('pointerleave', sOff);
+
+  const mapBtn = root.querySelector('.sc-map');
+  const aside = root.querySelector('.pxmap');
+  if (innerWidth < 760 || pm.rig === 'festival') { mapBtn.classList.remove('on'); aside.classList.add('off'); }
+  mapBtn.addEventListener('click', () => { mapBtn.classList.toggle('on'); aside.classList.toggle('off'); });
+
+  const box = root.querySelector('.pxmap-box');
+  const pxTabs = [...root.querySelectorAll('.pxmap-tabs button')];
+  const setPxMode = (mode) => {
+    pxTabs.forEach((x) => x.classList.toggle('on', x.dataset.mode === mode));
+    box.dataset.mode = mode;
+  };
+  pxTabs.forEach((b) => b.addEventListener('click', () => setPxMode(b.dataset.mode)));
+  setPxMode('live');
+
+  // ---- STAGE BUILD 2D→3D (4 fases interactivas + Auto-Build)
+  const buildBtn = root.querySelector('.sc-build');
+  const buildDock = root.querySelector('.build-dock');
+  const deckWrap = root.querySelector('.deck-wrap');
+  const badgeEl = root.querySelector('.build-badge');
+  const descEl = root.querySelector('.build-desc');
+  const stepBtns = [...root.querySelectorAll('.bd-step')];
+  const bdAuto = root.querySelector('.bd-auto');
+  const bdNext = root.querySelector('.bd-next');
+  const bdClose = root.querySelector('.bd-close');
+
+  let buildOpen = false;
+  let buildPhase = 1;
+  let autoTimer = 0;
+
+  const stopAutoBuild = () => {
+    clearInterval(autoTimer);
+    autoTimer = 0;
+    bdAuto.classList.remove('on');
+  };
+
+  const applyBuild = (open, phase = 1) => {
+    buildOpen = open;
+    buildPhase = phase;
+    root.classList.toggle('is-building', open);
+    buildBtn.classList.toggle('on', open);
+    buildDock.hidden = !open;
+    deckWrap.hidden = open;
+    stage.setBuildMode(open, phase);
+
+    if (open) {
+      const meta = BUILD_PHASES[phase - 1] || BUILD_PHASES[0];
+      badgeEl.textContent = tr(meta.short);
+      descEl.textContent = tr(meta.desc);
+      stepBtns.forEach((b) => {
+        const s = +b.dataset.step;
+        b.classList.toggle('on', s === phase);
+        b.classList.toggle('done', s < phase);
+      });
+      aside.classList.remove('off');
+      mapBtn.classList.add('on');
+      setPxMode(phase < 4 ? 'tpl' : 'live');
+    } else {
+      stopAutoBuild();
+      setPxMode('live');
+    }
+  };
+
+  const openBuild = () => applyBuild(true, 1);
+  const toggleBuild = () => applyBuild(!buildOpen, 1);
+
+  buildBtn.addEventListener('click', toggleBuild);
+  bdClose.addEventListener('click', () => applyBuild(false, 4));
+  bdNext.addEventListener('click', () => {
+    stopAutoBuild();
+    applyBuild(true, buildPhase >= 4 ? 1 : buildPhase + 1);
+  });
+  stepBtns.forEach((b) => b.addEventListener('click', () => {
+    stopAutoBuild();
+    applyBuild(true, +b.dataset.step);
+  }));
+  bdAuto.addEventListener('click', () => {
+    if (autoTimer) {
+      stopAutoBuild();
+    } else {
+      bdAuto.classList.add('on');
+      autoTimer = setInterval(() => applyBuild(true, buildPhase >= 4 ? 1 : buildPhase + 1), 3600);
+    }
+  });
+  cleanups.push(stopAutoBuild);
+
   const inView = () => { const r = root.getBoundingClientRect(); return r.bottom > innerHeight * 0.3 && r.top < innerHeight * 0.5; };
   const kd = (e) => {
     if (e.target.closest('input, textarea')) return;
     if (e.code === 'Space' && inView()) { e.preventDefault(); sOn(); }
-    if (e.key === ']' ) stage.next();
+    if (e.key === ']') stage.next();
     if (e.key === '[') stage.prev();
+    if (e.key === 'Escape' && buildOpen) applyBuild(false, 4);
   };
   const ku = (e) => { if (e.code === 'Space') sOff(); };
   addEventListener('keydown', kd); addEventListener('keyup', ku);
   cleanups.push(() => { removeEventListener('keydown', kd); removeEventListener('keyup', ku); });
 
-  const mapBtn = root.querySelector('.sc-map');
-  const aside = root.querySelector('.pxmap');
-  // el pixel map se abre solo en rigs con plano real (el de festival es genérico)
-  if (innerWidth < 760 || pm.rig === 'festival') { mapBtn.classList.remove('on'); aside.classList.add('off'); }
-  mapBtn.addEventListener('click', () => { mapBtn.classList.toggle('on'); aside.classList.toggle('off'); });
-
-  [...svgG, ...labels].forEach((g) => {
+  [...svgG, ...labels, ...cadTags].forEach((g) => {
     g.addEventListener('pointerenter', () => { stage.highlight(+g.dataset.i); setHover(+g.dataset.i); });
     g.addEventListener('pointerleave', () => { stage.highlight(undefined); setHover(-1); });
   });
 
-  const box = root.querySelector('.pxmap-box');
-  root.querySelectorAll('.pxmap-tabs button').forEach((b) => b.addEventListener('click', () => {
-    root.querySelectorAll('.pxmap-tabs button').forEach((x) => x.classList.toggle('on', x === b));
-    box.dataset.mode = b.dataset.mode;
-  }));
-  box.dataset.mode = 'live';
-
   const gen = root.querySelector('.pxmap-gen');
   if (gen) drawTestCard(gen, pm, title);
 
-  // señal en vivo: cada slice dibuja su recorte (o su propio video en rigs multi)
   const live = root.querySelector('.pxmap-live');
   const lctx = live.getContext('2d');
   const k = live.width / pm.canvas[0];
@@ -121,7 +265,6 @@ export function mountStage(root, pm, title = '') {
   drawLive();
   cleanups.push(() => cancelAnimationFrame(rafL));
 
-  // deck: la rueda vertical (o el trackpad) desplaza la fila de clips en horizontal
   const deck = root.querySelector('.deck');
   const onDeckWheel = (e) => {
     if (Math.abs(e.deltaY) <= Math.abs(e.deltaX) || deck.scrollWidth <= deck.clientWidth) return;
@@ -130,7 +273,12 @@ export function mountStage(root, pm, title = '') {
   };
   deck.addEventListener('wheel', onDeckWheel, { passive: false });
 
-  return { stage, destroy() { stage.destroy(); cleanups.forEach((f) => f()); } };
+  return {
+    stage,
+    openBuild,
+    toggleBuild,
+    destroy() { stage.destroy(); cleanups.forEach((f) => f()); },
+  };
 }
 
 function drawTestCard(c, pm, title) {

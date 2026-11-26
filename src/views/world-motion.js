@@ -1,12 +1,19 @@
 // Mundo 02 — Motion Graphics & Design.
-// Un "estudio" tipo programa de animación: panel de composiciones, visor con timecode,
-// línea de tiempo con capas y keyframes, editor de curvas y tipografía cinética de fondo.
+// Estudio tipo software de animación: composiciones, visor con timecode, línea de tiempo
+// con keyframes, editor de curvas y fondo interactivo de tipografía cinética "SYSTEM32".
 import { projectsOf, worldOf, t, tr, pad, asset, posterOf } from '../data.js';
-import { mouse } from '../ui/cursor.js';
+import { KINETIC_MODES, mountSystem32Kinetic } from '../gl/kinetic-system32.js';
 
 const FPS = 30;
 const tc = (s) => { const f = Math.floor((s % 1) * FPS); const x = Math.floor(s); return `${pad(Math.floor(x / 3600))}:${pad(Math.floor(x / 60) % 60)}:${pad(x % 60)}:${pad(f)}`; };
 const hash = (s) => { let h = 2166136261; for (const c of s) h = Math.imul(h ^ c.charCodeAt(0), 16777619); return (h >>> 0) / 4294967295; };
+
+const MODE_LABELS = {
+  repel: { es: 'Repel', en: 'Repel' },
+  wave: { es: 'Onda', en: 'Wave' },
+  vortex: { es: 'Vórtice', en: 'Vortex' },
+  glitch: { es: 'Glitch', en: 'Glitch' },
+};
 
 export function renderMotionWorld(app) {
   const w = worldOf('motion');
@@ -16,11 +23,18 @@ export function renderMotionWorld(app) {
   const el = document.createElement('div');
   el.className = 'world world--motion';
   el.innerHTML = `
+  <canvas class="kinetic-canvas" aria-hidden="true"></canvas>
   <header class="w-head">
     <p class="mono w-kicker"><span class="w-dot"></span>${tr({ es: 'MUNDO', en: 'WORLD' })} ${w.index} // ${w.coords}</p>
     <h1 class="w-title">${tr(w.name)}</h1>
   </header>
-  <div class="kinetic" aria-hidden="true"></div>
+  <div class="m-kin-bar mono">
+    <span class="m-kin-label">SYSTEM32 TYPE</span>
+    <span class="seg">
+      ${KINETIC_MODES.map((m) => `<button type="button" data-kmode="${m}">${tr(MODE_LABELS[m])}</button>`).join('')}
+    </span>
+    <button type="button" class="m-kin-rand" data-kmode="random" title="Key K">${tr({ es: 'Aleatorio', en: 'Random' })}</button>
+  </div>
   <aside class="m-comps">
     <p class="mono dim m-panel-k">${t('composition')}s · ${pad(list.length)}</p>
     ${list.map((p, i) => `<button class="m-comp" data-i="${i}">
@@ -57,9 +71,17 @@ export function renderMotionWorld(app) {
   const ruler = el.querySelector('.m-ruler');
   const tl = el.querySelector('.m-timeline');
   const head = el.querySelector('.m-head');
-  const kin = el.querySelector('.kinetic');
   const graph = el.querySelector('.m-graph');
   const gctx = graph.getContext('2d');
+  const modeBtns = [...el.querySelectorAll('[data-kmode]')];
+
+  // Fondo interactivo de tipografía cinética SYSTEM32
+  const kinetic = mountSystem32Kinetic(el.querySelector('.kinetic-canvas'), el, {
+    onModeChange: (active) => {
+      modeBtns.forEach((b) => b.classList.toggle('on', b.dataset.kmode === active));
+    },
+  });
+  modeBtns.forEach((b) => b.addEventListener('click', () => kinetic.setMode(b.dataset.kmode)));
 
   const mediaOf = (p) => {
     const vids = (p.gallery || []).filter((g) => g.type === 'video');
@@ -78,7 +100,6 @@ export function renderMotionWorld(app) {
     frame.style.aspectRatio = `${m.w || 16} / ${m.h || 9}`;
     frame.classList.toggle('is-tall', ar < 1);
     el.querySelector('.m-res').textContent = `${m.w || '?'}×${m.h || '?'} · ${FPS}fps`;
-    // capas de la línea de tiempo: un layer por pieza del proyecto
     layersEl.innerHTML = items.map((it, k) => {
       const a = 0.04 + hash(it.src) * 0.2, b = 0.7 + hash(it.src + 'b') * 0.28;
       const kf = [0, 1, 2, 3].map((j) => (a + (b - a) * (0.08 + j * 0.28 + hash(it.src + j) * 0.12)));
@@ -90,19 +111,16 @@ export function renderMotionWorld(app) {
       </button>`;
     }).join('');
     layersEl.querySelectorAll('.m-layer').forEach((b) => b.addEventListener('click', (e) => { e.stopPropagation(); show(cur, +b.dataset.k); }));
-    // tipografía cinética: el título letra por letra
-    kin.innerHTML = p.title.split('').map((c, k) => `<span style="--k:${k}">${c === ' ' ? '&nbsp;' : c}</span>`).join('');
     el.querySelector('.w-info-k').textContent = `COMP ${pad(i + 1)} / ${pad(list.length)} · ${p.year} · ${tr(p.role)}`;
     el.querySelector('.w-info-t').textContent = p.title;
     el.querySelector('.w-info-s').textContent = tr(p.summary);
     el.querySelector('.w-info-cta').innerHTML = `<a class="pill pill--fill" href="#/p/${p.id}">${t('openGallery')} →</a>`;
+    kinetic.pulse();
   }
   el.querySelectorAll('.m-comp').forEach((b) => b.addEventListener('click', () => show(+b.dataset.i)));
 
-  // regla de tiempo
   ruler.innerHTML = Array.from({ length: 11 }, (_, k) => `<span style="left:${k * 10}%">${k * 10}%</span>`).join('');
 
-  // scrub
   let dragging = false;
   const scrubTo = (e) => {
     const r = layersEl.getBoundingClientRect();
@@ -113,9 +131,7 @@ export function renderMotionWorld(app) {
   tl.addEventListener('pointermove', (e) => dragging && scrubTo(e));
   tl.addEventListener('pointerup', () => { dragging = false; v.play().catch(() => {}); });
 
-  // bucle de animación: timecode, cabezal, keyframes, curva y tipografía
   let raf;
-  const spans = () => kin.querySelectorAll('span');
   const loop = () => {
     raf = requestAnimationFrame(loop);
     const p = v.duration ? v.currentTime / v.duration : 0;
@@ -123,14 +139,7 @@ export function renderMotionWorld(app) {
     const r = layersEl.getBoundingClientRect(), tr0 = tl.getBoundingClientRect();
     head.style.transform = `translateX(${r.left - tr0.left + p * r.width}px)`;
     layersEl.querySelectorAll('.m-kf').forEach((k) => k.classList.toggle('hit', Math.abs(+k.dataset.x - p) < 0.02));
-    // tipografía: ola de ancho variable que recorre las letras al ritmo del video y del cursor
-    const vel = Math.min(1, Math.hypot(mouse.vx, mouse.vy) / 40);
-    spans().forEach((s, k) => {
-      const wave = Math.sin(p * Math.PI * 6 - k * 0.45) * 0.5 + 0.5;
-      s.style.fontVariationSettings = `'wdth' ${62 + wave * 63}, 'wght' ${300 + wave * 600}`;
-      s.style.transform = `translateY(${(wave - 0.5) * (10 + vel * 30)}px)`;
-    });
-    // editor de curvas: ease-in-out con el punto viajando sobre la curva
+
     const W = graph.width, H = graph.height;
     gctx.clearRect(0, 0, W, H);
     gctx.strokeStyle = 'rgba(237,235,230,.12)'; gctx.lineWidth = 1;
@@ -152,6 +161,7 @@ export function renderMotionWorld(app) {
     if (e.target.closest('input, textarea')) return;
     if (e.key === 'ArrowDown') { e.preventDefault(); show((cur + 1) % list.length); }
     if (e.key === 'ArrowUp') { e.preventDefault(); show((cur - 1 + list.length) % list.length); }
+    if (e.key === 'k' || e.key === 'K') { kinetic.setMode('random'); }
     if (e.code === 'Space') { e.preventDefault(); v.paused ? v.play() : v.pause(); }
   };
   addEventListener('keydown', onKey);
@@ -159,6 +169,11 @@ export function renderMotionWorld(app) {
 
   return {
     name: 'world',
-    destroy() { cancelAnimationFrame(raf); removeEventListener('keydown', onKey); v.pause(); v.removeAttribute('src'); v.load(); },
+    destroy() {
+      cancelAnimationFrame(raf);
+      kinetic.destroy();
+      removeEventListener('keydown', onKey);
+      v.pause(); v.removeAttribute('src'); v.load();
+    },
   };
 }
