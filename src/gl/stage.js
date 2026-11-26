@@ -26,7 +26,7 @@ const ledFrag = /* glsl */ `
 uniform sampler2D map; uniform sampler2D tplMap;
 uniform vec4 rect; uniform vec4 tplRect; uniform vec2 px; uniform float cab;
 uniform float uTime; uniform float uGlitch; uniform float uStrobe; uniform float uHover;
-uniform float uOn; uniform float uReady; uniform float uUseTpl; uniform float uAlpha;
+uniform float uOn; uniform float uReady; uniform float uUseTpl;
 varying vec2 vUv;
 float hash(vec2 p){ return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }
 void main(){
@@ -47,19 +47,19 @@ void main(){
   c = mix(c, tplC, uUseTpl);
   vec2 p = vUv * px;
   vec2 f = abs(fract(p) - 0.5);
-  vec2 w = fwidth(p);
+  vec2 w = max(fwidth(p), vec2(0.0005));
   float grid = 1.0 - (1.0 - smoothstep(0.5 - w.x, 0.5, f.x * 1.15)) * (1.0 - smoothstep(0.5 - w.y, 0.5, f.y * 1.15));
   float pxVis = 1.0 - smoothstep(0.25, 0.7, max(w.x, w.y));
   c *= 1.0 - 0.45 * pxVis * (1.0 - grid);
-  vec2 cp = p / cab;
+  vec2 cp = p / max(cab, 1.0);
   vec2 cf = abs(fract(cp) - 0.5);
-  vec2 cw = fwidth(cp) * 1.2;
+  vec2 cw = max(fwidth(cp) * 1.2, vec2(0.0005));
   float seam = max(smoothstep(0.5 - cw.x, 0.5, cf.x), smoothstep(0.5 - cw.y, 0.5, cf.y));
   c *= 1.0 - 0.55 * seam;
   c = mix(c, abs(vec3(1.0) - c), uStrobe);
   c *= uOn;
-  c += mix(vec3(1.0, 0.29, 0.11), vec3(0.0, 0.9, 1.0), uUseTpl) * uHover * 0.24;
-  gl_FragColor = vec4(c * 0.94, uAlpha);
+  c += mix(vec3(1.0, 0.29, 0.11), vec3(0.0, 0.9, 1.0), uUseTpl) * uHover * 0.22;
+  gl_FragColor = vec4(clamp(c * 0.92, 0.0, 1.5), 1.0);
 }`;
 
 const beamVert = /* glsl */ `
@@ -75,9 +75,9 @@ const beamFrag = /* glsl */ `
 uniform vec3 color; uniform float intensity;
 varying float vT; varying vec3 vN; varying vec3 vV;
 void main(){
-  float edge = pow(abs(dot(vN, vV)), 1.6);
-  float fall = pow(vT, 2.2);
-  gl_FragColor = vec4(color * edge * fall * intensity, 1.0);
+  float edge = pow(max(abs(dot(vN, vV)), 0.0001), 1.6);
+  float fall = pow(max(vT, 0.0001), 2.2);
+  gl_FragColor = vec4(color * edge * fall * max(intensity, 0.0), 1.0);
 }`;
 
 function spriteTexture() {
@@ -241,11 +241,11 @@ export class Stage {
         px: { value: new THREE.Vector2(sl.w, sl.h) }, cab: { value: cab },
         uTime: { value: 0 }, uGlitch: { value: 0 }, uStrobe: { value: 0 },
         uHover: { value: 0 }, uOn: { value: 0 }, uReady: { value: 0 },
-        uUseTpl: { value: 0 }, uAlpha: { value: 1 },
+        uUseTpl: { value: 0 },
       };
       const mat = new THREE.ShaderMaterial({
         vertexShader: ledVert, fragmentShader: ledFrag, uniforms,
-        toneMapped: false, transparent: true, side: THREE.DoubleSide,
+        toneMapped: false, side: THREE.DoubleSide,
       });
 
       let mesh, back, wireGeo, centerLocal;
@@ -328,14 +328,13 @@ export class Stage {
       ]);
       const lGeo = new THREE.BufferGeometry();
       lGeo.setAttribute('position', new THREE.BufferAttribute(pts, 3));
-      const lMat = new THREE.LineDashedMaterial({
+      const lMat = new THREE.LineBasicMaterial({
         color: sliceColors[i % sliceColors.length],
-        dashSize: 0.22,
-        gapSize: 0.14,
         transparent: true,
         opacity: 0,
       });
       const leader = new THREE.Line(lGeo, lMat);
+      leader.frustumCulled = false;
       leader.visible = false;
       scene.add(leader);
       p.leader = leader;
@@ -500,7 +499,7 @@ export class Stage {
 
     const composer = (this.composer = new EffectComposer(renderer));
     composer.addPass(new RenderPass(scene, cam));
-    this.bloom = new UnrealBloomPass(new THREE.Vector2(256, 256), 0.5, 0.45, 0.78);
+    this.bloom = new UnrealBloomPass(new THREE.Vector2(256, 256), 0.16, 0.28, 0.88);
     composer.addPass(this.bloom);
     this.bloom.enabled = QUALITY[qLevel].bloom;
     composer.addPass(new OutputPass());
@@ -667,9 +666,11 @@ export class Stage {
     // Atmósfera CAD vs Concierto
     this.scene.background.lerpColors(BG_CONCERT, BG_CAD, this.cadMix);
     this.scene.fog.color.copy(this.scene.background);
+    this.scene.fog.density = 0.022 * (1 - 0.65 * this.cadMix);
     this.cadHemi.intensity = this.cadMix * 1.95;
     this.cadGrid.visible = this.cadMix > 0.02;
     this.cadGrid.material.opacity = this.cadMix * 0.55;
+    this.mirror.visible = QUALITY[qLevel].mirror && this.cadMix < 0.12;
     this.crowd.visible = this.beamsMix > 0.15;
     this.haze.visible = this.beamsMix > 0.15;
 
@@ -709,7 +710,6 @@ export class Stage {
       u.uReady.value += ((v.readyState >= 2 ? 1 : 0) - u.uReady.value) * 0.1;
       u.uHover.value += ((i === hi ? 1 : 0) - u.uHover.value) * 0.15;
       u.uUseTpl.value = this.tplMix;
-      u.uAlpha.value = 1 - e * 0.12;
 
       const isHov = i === hi;
       const wireOp = isHov ? 0.95 : this.cadMix * 0.65;
@@ -725,7 +725,6 @@ export class Stage {
         arr[0] = backC.x; arr[1] = backC.y; arr[2] = backC.z;
         arr[3] = frontC.x; arr[4] = frontC.y; arr[5] = frontC.z;
         p.leaderGeo.attributes.position.needsUpdate = true;
-        p.leader.computeLineDistances();
         p.leaderMat.opacity = Math.min(0.85, e * (isHov ? 1.0 : 0.72));
       }
     });
@@ -757,7 +756,7 @@ export class Stage {
     this.screenLight.intensity = (18 + env * 14) * this.on * (0.4 + 0.6 * this.beamsMix);
     this.boothStrip.material.color.copy(this.avg).multiplyScalar(1.5 + env);
     this.deckStrip.material.color.setScalar(0.3 + env * 1.2);
-    this.bloom.strength = (0.42 + env * 0.18 + this.strobe * 0.3) * (0.35 + 0.65 * this.beamsMix);
+    this.bloom.strength = (0.14 + env * 0.07 + this.strobe * 0.14) * (0.25 + 0.75 * this.beamsMix);
 
     this.controls.update();
     this.composer.render();
