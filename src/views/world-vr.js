@@ -3,6 +3,7 @@
 // en vivo; los cables llevan la señal al nodo de salida, que se ve en un visor estéreo VR.
 import { projectsOf, worldOf, t, tr, pad, asset } from '../data.js';
 import { mouse } from '../ui/cursor.js';
+import { ico } from '../ui/icons.js';
 
 const UTIL = [
   { id: 'audio', type: 'CHOP', name: 'audiodevicein1', x: 0, y: 8 },
@@ -21,7 +22,7 @@ export function renderVRWorld(app) {
   el.className = 'world world--vr';
   el.innerHTML = `
   <header class="w-head">
-    <p class="mono w-kicker"><span class="w-dot"></span>${tr({ es: 'MUNDO', en: 'WORLD' })} ${w.index} // ${w.coords}</p>
+    <p class="mono w-kicker">${ico('vr', 13)}${tr({ es: 'MUNDO', en: 'WORLD' })} ${w.index} // ${w.coords}</p>
     <h1 class="w-title">${tr(w.name)}</h1>
     <p class="mono dim w-hint">${t('nodesHint')}</p>
   </header>
@@ -38,7 +39,7 @@ export function renderVRWorld(app) {
   </section>
   <section class="hmd">
     <div class="hmd-lenses"><canvas class="hmd-c" width="900" height="460"></canvas></div>
-    <p class="mono dim hmd-spec">${t('headset')} · 6DOF · 90Hz · IPD 64mm</p>
+    <p class="mono dim hmd-spec">${ico('vr', 12)}${t('headset')} · 6DOF · 90Hz · IPD 64mm</p>
     <video class="hmd-src" muted loop playsinline crossorigin="anonymous"></video>
   </section>
   <article class="w-info">
@@ -146,7 +147,7 @@ export function renderVRWorld(app) {
     el.querySelector('.w-info-k').textContent = `VR NODE ${pad(i + 1)} / ${pad(list.length)} · ${p.year} · ${tr(p.role)}`;
     el.querySelector('.w-info-t').textContent = p.title;
     el.querySelector('.w-info-s').textContent = tr(p.summary);
-    el.querySelector('.w-info-cta').innerHTML = `<a class="pill pill--fill" href="#/p/${p.id}">${t('openGallery')} →</a>`;
+    el.querySelector('.w-info-cta').innerHTML = `<a class="pill pill--fill" href="#/p/${p.id}">${ico('gallery', 13)}${t('openGallery')}${ico('arrow', 13)}</a>`;
   }
 
   const ro = new ResizeObserver(drawWires);

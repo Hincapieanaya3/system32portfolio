@@ -6,6 +6,7 @@ import { projectsOf, worldOf, t, tr, pad, asset } from '../data.js';
 import { stageMarkup, mountStage } from './stage-ui.js';
 import { beat } from '../ui/beat.js';
 import { scramble } from '../ui/fx.js';
+import { ico } from '../ui/icons.js';
 
 const RIG_TAG = { square: '1:1 PXMAP', cross: 'CROSS', multi: '4 SCREENS', curved: 'CURVED', festival: 'FESTIVAL' };
 
@@ -20,7 +21,7 @@ export function renderStageWorld(app) {
   el.className = 'world world--stage';
   el.innerHTML = `
   <header class="w-head">
-    <p class="mono w-kicker"><span class="w-dot"></span>${tr({ es: 'MUNDO', en: 'WORLD' })} ${w.index} // ${w.coords}</p>
+    <p class="mono w-kicker">${ico('stage', 13)}${tr({ es: 'MUNDO', en: 'WORLD' })} ${w.index} // ${w.coords}</p>
     <h1 class="w-title">${tr(w.name)}</h1>
   </header>
   <section class="stage stage--world"></section>
@@ -95,9 +96,9 @@ export function renderStageWorld(app) {
     scramble(info.querySelector('.w-info-t'), { duration: 500 });
     info.querySelector('.w-info-s').textContent = tr(p.summary);
     info.querySelector('.w-info-cta').innerHTML = `
-      <button type="button" class="pill pill--build" data-open-build><i class="b-dot"></i>${t('stageBuild')}</button>
-      <a class="pill pill--fill" href="#/p/${p.id}" data-magnetic="0.2">${t('openGallery')} →</a>
-      ${p.liveSet ? `<a class="pill" href="${p.liveSet.url}" target="_blank" rel="noopener">▶ ${tr(p.liveSet.label) || t('liveSet')}</a>` : ''}`;
+      <button type="button" class="pill pill--build" data-open-build>${ico('build', 13)}${t('stageBuild')}</button>
+      <a class="pill pill--fill" href="#/p/${p.id}" data-magnetic="0.2">${ico('gallery', 13)}${t('openGallery')}${ico('arrow', 13)}</a>
+      ${p.liveSet ? `<a class="pill" href="${p.liveSet.url}" target="_blank" rel="noopener">${ico('play', 12)}${tr(p.liveSet.label) || t('liveSet')}</a>` : ''}`;
     info.querySelector('[data-open-build]')?.addEventListener('click', () => mounted?.toggleBuild());
     setTimeout(updateScroll, 400);
   }

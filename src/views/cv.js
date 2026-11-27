@@ -2,6 +2,7 @@
 import { resume, site, t, tr, asset } from '../data.js';
 import { bindReveal } from '../ui/fx.js';
 import { contactBlock, bindContact } from './home.js';
+import { ico } from '../ui/icons.js';
 
 export function renderCV(app) {
   const r = resume;
@@ -13,9 +14,9 @@ export function renderCV(app) {
     <h1 class="big" data-reveal data-fit>${site.name}</h1>
     <p class="cv-role" data-reveal>${tr(r.title)}</p>
     <div class="cv-cta" data-reveal>
-      <a class="pill pill--fill" href="${asset('Sebastian_Hincapie_Resume.pdf')}" download data-magnetic="0.2">↓ ${t('downloadCv')}</a>
-      <a class="pill" href="mailto:${site.email}">${site.email}</a>
-      <a class="pill" href="${site.linkedin}" target="_blank" rel="noopener">LinkedIn ↗</a>
+      <a class="pill pill--fill" href="${asset('Sebastian_Hincapie_Resume.pdf')}" download data-magnetic="0.2">${ico('download', 14)}${t('downloadCv')}</a>
+      <a class="pill" href="mailto:${site.email}">${ico('mail', 14)}${site.email}</a>
+      <a class="pill" href="${site.linkedin}" target="_blank" rel="noopener">LinkedIn${ico('external', 13)}</a>
     </div>
   </header>
   <section class="cv-sum"><p class="p-summary" data-reveal>${tr(r.summary)}</p></section>

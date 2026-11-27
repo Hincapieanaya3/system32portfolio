@@ -3,6 +3,7 @@ import { stageMarkup, mountStage } from './stage-ui.js';
 import { beat } from '../ui/beat.js';
 import { lenis } from '../ui/scroll.js';
 import { bindReveal, bindAutoplay, scramble, fitText } from '../ui/fx.js';
+import { ico } from '../ui/icons.js';
 
 export function renderProject(app, p) {
   const w = worldOf(p.world);
@@ -18,9 +19,9 @@ export function renderProject(app, p) {
   el.className = 'project';
   el.innerHTML = `
   <nav class="p-bar mono">
-    <a href="#/w/${p.world}" class="p-back" data-scramble><span class="scr">← ${tr(w.shortName)}</span></a>
-    <span class="p-count">${pad(p.index)} / ${pad(projects.length)} · <i class="dot" style="background:${w.accent}"></i>${tr({ es: 'MUNDO', en: 'WORLD' })} ${w.index}</span>
-    <span class="p-nav"><a href="#/p/${prevP.id}" aria-label="←" data-cursor="PREV">←</a><a href="#/p/${next.id}" aria-label="→" data-cursor="NEXT">→</a></span>
+    <a href="#/w/${p.world}" class="p-back" data-scramble>${ico('back', 13)}<span class="scr">${tr(w.shortName)}</span></a>
+    <span class="p-count" style="--wc:${w.accent}">${pad(p.index)} / ${pad(projects.length)} · ${ico(w.id, 13)}${tr({ es: 'MUNDO', en: 'WORLD' })} ${w.index}</span>
+    <span class="p-nav"><a href="#/p/${prevP.id}" aria-label="←" data-cursor="PREV">${ico('back', 14)}</a><a href="#/p/${next.id}" aria-label="→" data-cursor="NEXT">${ico('arrow', 14)}</a></span>
   </nav>
 
   ${pm && pm.rig !== 'festival' ? `<section class="stage">${stageMarkup(pm)}</section>` : heroMarkup(p)}
@@ -38,7 +39,7 @@ export function renderProject(app, p) {
   <section class="p-text">
     <p class="p-summary" data-reveal>${tr(p.summary)}</p>
     <div class="p-body" data-reveal>
-      ${p.liveSet ? `<a class="pill pill--fill" href="${p.liveSet.url}" target="_blank" rel="noopener">▶ ${tr(p.liveSet.label)}</a>` : ''}
+      ${p.liveSet ? `<a class="pill pill--fill" href="${p.liveSet.url}" target="_blank" rel="noopener">${ico('play', 13)}${tr(p.liveSet.label)}</a>` : ''}
       ${pm ? `<a class="p-ext mono" href="#/w/stage" data-scramble><span class="scr">${tr({ es: 'Ver en el escenario 3D del mundo 01 →', en: 'See it on the world 01 3D stage →' })}</span></a>` : ''}
     </div>
   </section>
@@ -51,7 +52,7 @@ export function renderProject(app, p) {
     <span class="p-next-media">${next.preview ? `<video muted loop playsinline preload="none" poster="${asset(next.poster)}" data-autoplay src="${asset(next.preview)}"></video>` : `<img src="${asset(next.poster)}" alt="" loading="lazy">`}</span>
   </a>
 
-  <div class="lightbox" hidden><button class="lb-x mono">${t('close')} ✕</button><div class="lb-media"></div><button class="lb-prev" aria-label="←">←</button><button class="lb-next" aria-label="→">→</button><span class="lb-n mono"></span></div>`;
+  <div class="lightbox" hidden><button class="lb-x mono">${t('close')}${ico('close', 12)}</button><div class="lb-media"></div><button class="lb-prev" aria-label="←">${ico('back', 16)}</button><button class="lb-next" aria-label="→">${ico('arrow', 16)}</button><span class="lb-n mono"></span></div>`;
   app.appendChild(el);
 
   let stage = null;

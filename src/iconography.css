@@ -1,0 +1,491 @@
+/* =====================================================================
+   SYSTEM32 — ICONOGRAFÍA GEOMÉTRICA Y BOTONES (PALETA ORIGINAL)
+   Mantiene intacta la gama sobria original: obsidiana (#070708), hueso
+   (#edebe6), gris técnico (#8a8780) y un único color de acento activo.
+   ===================================================================== */
+
+.s32-ico {
+  display: inline-block;
+  flex: 0 0 auto;
+  vertical-align: -0.16em;
+  transition: transform 0.35s var(--ease), color 0.22s, opacity 0.22s;
+}
+
+/* ---- Marca superior SYSTEM32: emblema pixel + núcleo concéntrico */
+.hud-mark--v2 {
+  display: inline-grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border: 1px solid var(--line);
+  background: rgba(14, 14, 16, 0.85);
+  border-radius: 5px;
+  transition: border-color 0.25s, transform 0.4s var(--ease);
+}
+.hud-logo:hover .hud-mark--v2 {
+  border-color: var(--accent);
+  transform: rotate(90deg);
+}
+
+/* ---- Barra de navegación superior: íconos monocromos sobrios + acento solo en activo */
+.hud {
+  gap: 10px;
+}
+.hud-nav {
+  background:
+    radial-gradient(rgba(237, 235, 230, 0.06) 1px, transparent 1px),
+    rgba(11, 11, 14, 0.78);
+  background-size: 8px 8px, auto;
+  border-color: var(--line);
+}
+.hud-nav a {
+  gap: 5px;
+  padding: 6px 9px;
+  font-size: 12px;
+  border: 1px solid transparent;
+  transition: background 0.22s, color 0.22s, border-color 0.22s;
+}
+.hud-nav a .s32-ico {
+  color: var(--dim);
+}
+.hud-nav a:hover:not(.on) {
+  color: var(--fg);
+  border-color: rgba(237, 235, 230, 0.24);
+  background:
+    repeating-linear-gradient(
+      90deg,
+      rgba(237, 235, 230, 0.06) 0 2px,
+      transparent 2px 5px
+    ),
+    rgba(18, 18, 22, 0.88);
+}
+.hud-nav a:hover:not(.on) .s32-ico {
+  color: var(--fg);
+  transform: scale(1.12);
+}
+.hud-nav a.on {
+  border-color: transparent;
+}
+.hud-nav a.on .s32-ico {
+  color: #050507;
+}
+
+/* Links Contenidos & CV con micro-iconos neutros + contador entre corchetes */
+.hud-r {
+  gap: 8px;
+}
+.hud-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 8px;
+  border-radius: 99px;
+  border: 1px solid transparent;
+  white-space: nowrap;
+  transition: border-color 0.22s, background 0.22s, color 0.22s;
+}
+.hud-link .s32-ico {
+  color: var(--dim);
+}
+.hud-link:hover {
+  border-color: rgba(237, 235, 230, 0.2);
+  background: rgba(237, 235, 230, 0.05);
+}
+.hud-link:hover .s32-ico {
+  color: var(--fg);
+}
+.hud-link.on {
+  border-color: rgba(237, 235, 230, 0.2);
+  background: rgba(237, 235, 230, 0.05);
+}
+.hud-link.on .s32-ico {
+  color: var(--accent);
+}
+.hud-count-br {
+  font-family: var(--f-mono);
+  font-size: 9.5px;
+  color: var(--dim);
+  letter-spacing: 0.04em;
+}
+
+/* BPM: blanco concéntrico al compás (mismo tono discreto que el punto original) */
+.hud-bpm {
+  gap: 7px;
+  background: rgba(11, 11, 14, 0.82);
+}
+.hud-bpm .s32-ico--bpm {
+  color: var(--accent);
+  opacity: 0.45;
+}
+.hud-bpm.hit .s32-ico--bpm {
+  animation: bpmTarget 0.34s ease-out;
+}
+@keyframes bpmTarget {
+  0% { opacity: 1; transform: scale(1.38); filter: drop-shadow(0 0 6px var(--accent)); }
+  100% { opacity: 0.45; transform: scale(1); filter: none; }
+}
+
+/* ---- Botón principal de portada { Entrar a los mundos } (llaves { } + textura halftone sutil) */
+.hero-enter {
+  position: relative;
+  gap: 12px;
+  padding: 15px 24px;
+  border-radius: 999px;
+  border: 1px solid rgba(237, 235, 230, 0.22);
+  background:
+    repeating-linear-gradient(
+      90deg,
+      rgba(7, 7, 8, 0.045) 0 2px,
+      transparent 2px 6px
+    ),
+    var(--fg);
+  color: var(--bg);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.55);
+}
+.hero-enter-brace {
+  font-family: var(--f-mono);
+  font-size: 1.12em;
+  font-weight: 500;
+  color: rgba(7, 7, 8, 0.42);
+  transition: transform 0.35s var(--ease), color 0.25s;
+}
+.hero-enter:hover .hero-enter-brace:first-of-type {
+  transform: translateX(-3px);
+  color: #060608;
+}
+.hero-enter:hover .hero-enter-brace:last-of-type {
+  transform: translateX(3px);
+  color: #060608;
+}
+.hero-enter:hover {
+  background:
+    repeating-linear-gradient(
+      90deg,
+      rgba(0, 0, 0, 0.08) 0 2px,
+      transparent 2px 6px
+    ),
+    var(--accent);
+  border-color: var(--accent);
+  color: #050507;
+  transform: translateY(-2px);
+}
+.hero-enter:hover .s32-ico {
+  transform: translate(2px, -2px) scale(1.08);
+}
+
+/* Chips de mundos en portada: neutros en reposo, acento solo al pasar el cursor */
+.hero-chips a {
+  gap: 7px;
+  padding: 6px 11px;
+  border-radius: 6px;
+  border: 1px solid var(--line);
+  background:
+    radial-gradient(rgba(237, 235, 230, 0.07) 1px, transparent 1px),
+    rgba(9, 9, 12, 0.82);
+  background-size: 7px 7px, auto;
+  color: var(--fg);
+  transition: transform 0.25s var(--ease), background 0.22s, color 0.22s, border-color 0.22s;
+}
+.hero-chips a .s32-ico {
+  color: var(--dim);
+}
+.hero-chips a:hover {
+  background: rgba(18, 18, 22, 0.94);
+  border-color: var(--fg);
+  color: var(--fg);
+  transform: translateY(-2px);
+}
+.hero-chips a:hover .s32-ico {
+  color: var(--accent);
+  transform: scale(1.12);
+}
+
+/* ---- Sistema unificado de botones .pill (obsidiana + textura de puntos + borde hueso) */
+.pill {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background:
+    radial-gradient(rgba(237, 235, 230, 0.06) 1px, transparent 1px),
+    rgba(10, 10, 13, 0.82);
+  background-size: 7px 7px, auto;
+  overflow: hidden;
+  transition: background 0.24s, color 0.24s, border-color 0.24s, transform 0.35s var(--ease);
+}
+.pill .s32-ico {
+  opacity: 0.82;
+}
+.pill:hover {
+  border-color: var(--fg);
+  background:
+    repeating-linear-gradient(
+      90deg,
+      rgba(237, 235, 230, 0.05) 0 2px,
+      transparent 2px 6px
+    ),
+    rgba(16, 16, 20, 0.92);
+  color: var(--fg);
+  transform: translateY(-1px);
+}
+.pill:hover .s32-ico {
+  opacity: 1;
+  transform: translateX(2px);
+}
+.pill--fill {
+  background:
+    repeating-linear-gradient(
+      90deg,
+      rgba(0, 0, 0, 0.07) 0 2px,
+      transparent 2px 6px
+    ),
+    var(--accent);
+  border-color: var(--accent);
+  color: #050507;
+  font-weight: 600;
+}
+.pill--fill .s32-ico {
+  opacity: 1;
+}
+.pill--fill:hover {
+  background:
+    repeating-linear-gradient(
+      90deg,
+      rgba(0, 0, 0, 0.05) 0 2px,
+      transparent 2px 6px
+    ),
+    var(--fg);
+  border-color: var(--fg);
+  color: #050507;
+}
+.pill--build {
+  border-color: rgba(0, 229, 255, 0.5);
+  background:
+    repeating-linear-gradient(
+      90deg,
+      rgba(0, 229, 255, 0.06) 0 2px,
+      transparent 2px 6px
+    ),
+    rgba(4, 15, 26, 0.85);
+  color: #e6fbff;
+}
+.pill--build .s32-ico {
+  color: #00e5ff;
+  opacity: 1;
+}
+.pill--build:hover {
+  background: #00e5ff;
+  border-color: #00e5ff;
+  color: #04070d;
+}
+.pill--build:hover .s32-ico {
+  color: #04070d;
+  transform: translateY(-1px) scale(1.08);
+}
+
+/* ---- Controles de escenario 3D y barra SYSTEM32 de Motion */
+.stage-ctrl button,
+.m-kin-bar .seg button,
+.m-kin-rand {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 5px;
+}
+.stage-ctrl .seg,
+.m-kin-bar .seg {
+  border-radius: 6px;
+  overflow: hidden;
+  border-color: rgba(237, 235, 230, 0.16);
+}
+.stage-ctrl .seg button,
+.m-kin-bar .seg button {
+  border-radius: 0;
+}
+.m-kin-bar .seg button:not(.on) {
+  color: rgba(237, 235, 230, 0.76);
+}
+.m-kin-bar .seg button:not(.on):hover {
+  color: var(--fg);
+}
+.sc-build {
+  gap: 6px;
+  border-radius: 6px;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      rgba(0, 229, 255, 0.07) 0 2px,
+      transparent 2px 6px
+    ),
+    rgba(4, 16, 28, 0.88);
+}
+.sc-build .s32-ico {
+  color: #00e5ff;
+}
+.sc-build.on .s32-ico {
+  color: #04070d;
+}
+.sc-strobe.on .s32-ico,
+.sc-auto.on .s32-ico,
+.sc-map.on .s32-ico {
+  color: currentColor;
+}
+.sc-auto:hover .s32-ico--autopilot {
+  transform: rotate(120deg);
+}
+.sc-strobe:hover .s32-ico--spark {
+  transform: rotate(45deg) scale(1.12);
+}
+
+/* ---- Tarjetas del Hub: emblema geométrico + patrón sutil de puntos en esquina */
+.wcard-n {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 5px;
+  padding: 5px 9px;
+  font-weight: 600;
+}
+.wcard-n .s32-ico {
+  color: #050507;
+}
+.wcard-go {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.wcard:hover .wcard-go .s32-ico {
+  transform: translate(2px, -2px);
+}
+.wcard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 96px;
+  height: 96px;
+  pointer-events: none;
+  background: radial-gradient(rgba(237, 235, 230, 0.2) 1.1px, transparent 1.4px);
+  background-size: 9px 9px;
+  mask-image: radial-gradient(circle at 100% 0%, #000 10%, transparent 72%);
+  -webkit-mask-image: radial-gradient(circle at 100% 0%, #000 10%, transparent 72%);
+  opacity: 0.45;
+  transition: opacity 0.35s;
+}
+.wcard:hover::before {
+  opacity: 0.85;
+}
+
+/* ---- Contenidos: chips sobrios con emblema monocromo + botones de vista */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 6px;
+}
+.chip .s32-ico {
+  color: var(--dim);
+}
+.chip:hover .s32-ico {
+  color: var(--fg);
+}
+.chip.on .s32-ico {
+  color: #050507;
+}
+.views button {
+  border-radius: 5px;
+}
+
+/* ---- Juegos: Press Start con textura halftone sobria + icono starburst */
+.g-start {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  border-radius: 8px;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      rgba(237, 235, 230, 0.05) 0 2px,
+      transparent 2px 6px
+    ),
+    rgba(12, 12, 14, 0.85);
+}
+
+/* ---- Encabezados, filas, contacto y alineación fina */
+.w-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+.w-kicker .s32-ico {
+  color: var(--accent);
+}
+.r-k {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.r-k .s32-ico {
+  color: var(--dim);
+}
+.row:not(.row--head):hover .r-k .s32-ico {
+  color: var(--bg);
+}
+
+.contact-links a {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+.contact-links a .s32-ico {
+  color: currentColor;
+  opacity: 0.7;
+}
+.contact-links a:hover .s32-ico {
+  opacity: 1;
+  transform: translate(2px, -2px);
+}
+.to-top,
+.p-back,
+.p-count,
+.lb-x,
+.hmd-spec,
+.build-actions button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.p-count .s32-ico {
+  color: var(--accent);
+}
+.hmd-spec .s32-ico {
+  color: var(--accent);
+}
+
+@media (max-width: 1380px) {
+  .hud-clock {
+    display: none;
+  }
+  .hud-nav a .mono {
+    display: none;
+  }
+}
+
+@media (max-width: 1000px) {
+  .hud-link {
+    display: none;
+  }
+}
+
+@media (max-width: 760px) {
+  .hero-enter {
+    gap: 8px;
+    padding: 13px 18px;
+  }
+  .hud-nav a {
+    padding: 12px 14px;
+  }
+}

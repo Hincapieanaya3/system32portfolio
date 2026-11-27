@@ -1,6 +1,8 @@
 import './style.css';
 import './worlds.css';
+import './iconography.css';
 import { site, projects, worlds, worldOf, t, tr, pad, getLang, setLang, onLang } from './data.js';
+import { ico } from './ui/icons.js';
 import { initCursor } from './ui/cursor.js';
 import { beat } from './ui/beat.js';
 import { bindScramble, bindMagnetic, wipe, reducedMotion, fitText } from './ui/fx.js';
@@ -26,17 +28,17 @@ const hud = document.getElementById('hud');
 function drawHud() {
   hud.innerHTML = `
   <a href="#/" class="hud-logo" data-scramble aria-label="SYSTEM32">
-    <span class="hud-mark" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span><span class="scr">SYSTEM32</span>
+    <span class="hud-mark--v2" aria-hidden="true">${ico('brand', 16)}</span><span class="scr">SYSTEM32</span>
   </a>
   <nav class="hud-nav" aria-label="Mundos">
-    <a href="#/hub" data-r="hub"><i class="wd"></i><span class="mono">00</span> ${t('hub')}</a>
-    ${worlds.map((w) => `<a href="#/w/${w.id}" data-r="w/${w.id}" style="--wc:${w.accent}"><i class="wd"></i><span class="mono">${w.index}</span> ${tr(w.shortName)}</a>`).join('')}
+    <a href="#/hub" data-r="hub">${ico('hub', 13)}<span class="mono">00</span> ${t('hub')}</a>
+    ${worlds.map((w) => `<a href="#/w/${w.id}" data-r="w/${w.id}" style="--wc:${w.accent}">${ico(w.id, 13)}<span class="mono">${w.index}</span> ${tr(w.shortName)}</a>`).join('')}
   </nav>
   <div class="hud-r">
-    <a href="#/contenidos" class="hud-link" data-r="contenidos" data-scramble><span class="scr">${t('index')}</span><sup>${pad(projects.length)}</sup></a>
-    <a href="#/cv" class="hud-link" data-r="cv" data-scramble><span class="scr">CV</span></a>
+    <a href="#/contenidos" class="hud-link" data-r="contenidos" data-scramble>${ico('contents', 13)}<span class="scr">${t('index')}</span><span class="hud-count-br">[${pad(projects.length)}]</span></a>
+    <a href="#/cv" class="hud-link" data-r="cv" data-scramble>${ico('cv', 13)}<span class="scr">CV</span></a>
     <button class="hud-lang mono" type="button" aria-label="Idioma / Language"><span data-l="es">ES</span><span data-l="en">EN</span></button>
-    <button class="hud-bpm" type="button" title="Tap tempo" data-cursor="TAP"><i class="bpm-dot"></i><span class="bpm-val">${beat.bpm.toFixed(2)}</span><span class="bpm-u">BPM</span></button>
+    <button class="hud-bpm" type="button" title="Tap tempo" data-cursor="TAP">${ico('bpm', 14)}<span class="bpm-val">${beat.bpm.toFixed(2)}</span><span class="bpm-u">BPM</span></button>
     <span class="hud-clock" title="Medellín">MDE <b>--:--:--</b></span>
     <button class="hud-menu" type="button" aria-label="Menú" aria-expanded="false"><i></i><i></i></button>
   </div>`;

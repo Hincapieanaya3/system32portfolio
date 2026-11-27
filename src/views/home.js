@@ -3,6 +3,7 @@ import { site, worlds, projectsOf, projects, t, tr, asset, pad, isImg } from '..
 import { LedWall } from '../gl/ledwall.js';
 import { lenis } from '../ui/scroll.js';
 import { bindReveal, splitWords, scramble } from '../ui/fx.js';
+import { ico } from '../ui/icons.js';
 
 export function renderGate(app) {
   const el = document.createElement('div');
@@ -19,8 +20,8 @@ export function renderGate(app) {
         <p class="hero-roles">${roles.map((r) => `<span>${r}</span>`).join('')}</p>
       </div>
       <div class="hero-center">
-        <a href="#/hub" class="hero-enter" data-magnetic="0.3" data-cursor="ENTER">${t('enterWorlds')} <kbd class="mono">↵</kbd></a>
-        <p class="hero-chips">${worlds.map((w) => `<a href="#/w/${w.id}" style="--wc:${w.accent}" class="mono"><i></i>${w.index} ${tr(w.shortName)}</a>`).join('')}</p>
+        <a href="#/hub" class="hero-enter" data-magnetic="0.3" data-cursor="ENTER"><span class="hero-enter-brace">{</span>${ico('enter', 16)}<span>${t('enterWorlds')}</span><kbd class="mono">↵</kbd><span class="hero-enter-brace">}</span></a>
+        <p class="hero-chips">${worlds.map((w) => `<a href="#/w/${w.id}" style="--wc:${w.accent}" class="mono">${ico(w.id, 12)}${w.index} ${tr(w.shortName)}</a>`).join('')}</p>
       </div>
       <div class="hero-loc mono" data-reveal>
         <span>${site.city}</span><span class="dim">6.2442° N · 75.5812° W</span>
@@ -63,13 +64,13 @@ export function renderHub(app) {
         return `
         <a class="wcard" href="#/w/${w.id}" style="--wc:${w.accent}; --i:${i}" data-cursor="${t('enterWorld').toUpperCase()}">
           <div class="wcard-media">${media}</div>
-          <div class="wcard-top mono"><span class="wcard-n">${tr({ es: 'MUNDO', en: 'WORLD' })} ${w.index}</span><span class="wcard-count">${pad(list.length)} ${t('projects')}</span></div>
+          <div class="wcard-top mono"><span class="wcard-n">${ico(w.id, 13)}<span class="wcard-n-txt">${tr({ es: 'MUNDO', en: 'WORLD' })} ${w.index}</span></span><span class="wcard-count">${pad(list.length)} ${t('projects')}</span></div>
           <div class="wcard-body">
             <h2 class="wcard-title" data-fit="125">${tr(w.name)}</h2>
             <p class="wcard-tag">${tr(w.tagline)}</p>
             <ul class="wcard-list mono">${list.slice(0, 5).map((p) => `<li>${p.title}</li>`).join('')}${list.length > 5 ? `<li class="dim">+${list.length - 5}</li>` : ''}</ul>
           </div>
-          <div class="wcard-foot mono"><span class="dim"><kbd>${i + 1}</kbd> ${w.coords}</span><span class="wcard-go">${t('enterWorld')} →</span></div>
+          <div class="wcard-foot mono"><span class="dim"><kbd>${i + 1}</kbd> ${w.coords}</span><span class="wcard-go">${t('enterWorld')} ${ico('enter', 13)}</span></div>
         </a>`;
       }).join('')}
     </div>
@@ -81,8 +82,8 @@ export function renderHub(app) {
     <p class="mono dim info-k" data-reveal>( ${tr(site.role)} )</p>
     <p class="statement" data-split>${tr(site.bio)}</p>
     <div class="info-cta" data-reveal>
-      <a href="#/cv" class="pill" data-magnetic="0.25" data-scramble><span class="scr">${t('cv')} →</span></a>
-      <a href="#/contenidos" class="pill" data-magnetic="0.25" data-scramble><span class="scr">${t('index')} (${projects.length}) →</span></a>
+      <a href="#/cv" class="pill" data-magnetic="0.25" data-scramble>${ico('cv', 14)}<span class="scr">${t('cv')}</span>${ico('arrow', 13)}</a>
+      <a href="#/contenidos" class="pill" data-magnetic="0.25" data-scramble>${ico('contents', 14)}<span class="scr">${t('index')} [${projects.length}]</span>${ico('arrow', 13)}</a>
       <p class="avail ${site.available ? 'on' : ''}"><i></i>${t('available')}</p>
     </div>
   </section>
@@ -118,7 +119,7 @@ export function renderHub(app) {
   cards.forEach((c) => {
     io.observe(c);
     const v = c.querySelector('video');
-    c.addEventListener('pointerenter', () => { if (v) play(v); scramble(c.querySelector('.wcard-n'), { duration: 400 }); });
+    c.addEventListener('pointerenter', () => { if (v) play(v); scramble(c.querySelector('.wcard-n-txt'), { duration: 400 }); });
     c.addEventListener('pointerleave', () => { v?.pause(); c.style.transform = ''; });
     if (fine) c.addEventListener('pointermove', (e) => {
       const r = c.getBoundingClientRect();
@@ -180,16 +181,16 @@ export function contactBlock() {
     <p class="mono dim" data-reveal>( ${t('contact')} )</p>
     <h2 class="contact-big" data-reveal data-fit="125">${t('contactBig')}</h2>
     <div class="contact-links">
-      <a href="mailto:${site.email}" data-magnetic="0.25" data-scramble data-cursor="MAIL"><span class="scr">${site.email}</span></a>
-      <a href="${site.linkedin}" target="_blank" rel="noopener" data-magnetic="0.25" data-scramble data-cursor="IN ↗"><span class="scr">LinkedIn</span></a>
-      <a href="${site.instagram}" target="_blank" rel="noopener" data-magnetic="0.25" data-scramble data-cursor="IG ↗"><span class="scr">Instagram</span></a>
-      <a href="${site.behance}" target="_blank" rel="noopener" data-magnetic="0.25" data-scramble data-cursor="BE ↗"><span class="scr">Behance</span></a>
+      <a href="mailto:${site.email}" data-magnetic="0.25" data-scramble data-cursor="MAIL">${ico('mail', 16)}<span class="scr">${site.email}</span></a>
+      <a href="${site.linkedin}" target="_blank" rel="noopener" data-magnetic="0.25" data-scramble data-cursor="IN ↗"><span class="scr">LinkedIn</span>${ico('external', 14)}</a>
+      <a href="${site.instagram}" target="_blank" rel="noopener" data-magnetic="0.25" data-scramble data-cursor="IG ↗"><span class="scr">Instagram</span>${ico('external', 14)}</a>
+      <a href="${site.behance}" target="_blank" rel="noopener" data-magnetic="0.25" data-scramble data-cursor="BE ↗"><span class="scr">Behance</span>${ico('external', 14)}</a>
     </div>
   </section>
   <footer class="foot mono">
     <span>C:\\WINDOWS\\SYSTEM32\\SEBASTIAN</span>
     <span>© ${new Date().getFullYear()} ${site.name}</span>
-    <button class="to-top" type="button" data-scramble><span class="scr">${t('backTop')}</span></button>
+    <button class="to-top" type="button" data-scramble>${ico('up', 13)}<span class="scr">${t('backTop')}</span></button>
   </footer>`;
 }
 

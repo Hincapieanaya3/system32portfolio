@@ -3,6 +3,7 @@
 // con keyframes, editor de curvas y fondo interactivo de tipografía cinética "SYSTEM32".
 import { projectsOf, worldOf, t, tr, pad, asset, posterOf } from '../data.js';
 import { KINETIC_MODES, mountSystem32Kinetic } from '../gl/kinetic-system32.js';
+import { ico } from '../ui/icons.js';
 
 const FPS = 30;
 const tc = (s) => { const f = Math.floor((s % 1) * FPS); const x = Math.floor(s); return `${pad(Math.floor(x / 3600))}:${pad(Math.floor(x / 60) % 60)}:${pad(x % 60)}:${pad(f)}`; };
@@ -25,15 +26,15 @@ export function renderMotionWorld(app) {
   el.innerHTML = `
   <canvas class="kinetic-canvas" aria-hidden="true"></canvas>
   <header class="w-head">
-    <p class="mono w-kicker"><span class="w-dot"></span>${tr({ es: 'MUNDO', en: 'WORLD' })} ${w.index} // ${w.coords}</p>
+    <p class="mono w-kicker">${ico('motion', 13)}${tr({ es: 'MUNDO', en: 'WORLD' })} ${w.index} // ${w.coords}</p>
     <h1 class="w-title">${tr(w.name)}</h1>
   </header>
   <div class="m-kin-bar mono">
     <span class="m-kin-label">SYSTEM32 TYPE</span>
     <span class="seg">
-      ${KINETIC_MODES.map((m) => `<button type="button" data-kmode="${m}">${tr(MODE_LABELS[m])}</button>`).join('')}
+      ${KINETIC_MODES.map((m) => `<button type="button" data-kmode="${m}">${ico(m, 12)}${tr(MODE_LABELS[m])}</button>`).join('')}
     </span>
-    <button type="button" class="m-kin-rand" data-kmode="random" title="Key K">${tr({ es: 'Aleatorio', en: 'Random' })}</button>
+    <button type="button" class="m-kin-rand" data-kmode="random" title="Key K">${ico('random', 12)}${tr({ es: 'Aleatorio', en: 'Random' })}</button>
   </div>
   <aside class="m-comps">
     <p class="mono dim m-panel-k">${t('composition')}s · ${pad(list.length)}</p>
@@ -114,7 +115,7 @@ export function renderMotionWorld(app) {
     el.querySelector('.w-info-k').textContent = `COMP ${pad(i + 1)} / ${pad(list.length)} · ${p.year} · ${tr(p.role)}`;
     el.querySelector('.w-info-t').textContent = p.title;
     el.querySelector('.w-info-s').textContent = tr(p.summary);
-    el.querySelector('.w-info-cta').innerHTML = `<a class="pill pill--fill" href="#/p/${p.id}">${t('openGallery')} →</a>`;
+    el.querySelector('.w-info-cta').innerHTML = `<a class="pill pill--fill" href="#/p/${p.id}">${ico('gallery', 13)}${t('openGallery')}${ico('arrow', 13)}</a>`;
     kinetic.pulse();
   }
   el.querySelectorAll('.m-comp').forEach((b) => b.addEventListener('click', () => show(+b.dataset.i)));

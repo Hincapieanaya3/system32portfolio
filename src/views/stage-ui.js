@@ -2,6 +2,7 @@
 // vivo enlazado con las pantallas 3D, deck de canales y modo STAGE BUILD 2D→3D en 4 fases.
 import { Stage } from '../gl/stage.js';
 import { t, tr, asset, posterOf, pad } from '../data.js';
+import { ico } from '../ui/icons.js';
 
 const BUILD_PHASES = [
   {
@@ -53,13 +54,13 @@ export function stageMarkup(pm, { label } = {}) {
   <div class="stage-hud">
     <p class="mono stage-tag"><i class="rec"></i>RIG: ${pm.label} // ${cw}×${ch}px // ${pm.slices.length} SLICE${pm.slices.length > 1 ? 'S' : ''}${label ? ' — ' + label : ''}</p>
     <div class="stage-ctrl mono">
-      <button class="sc-build" type="button"><i class="b-dot"></i>${t('stageBuild')}</button>
+      <button class="sc-build" type="button">${ico('build', 13)}${t('stageBuild')}</button>
       <span class="seg">
-        <button data-cam="wide" class="on">${t('camWide')}</button><button data-cam="stage">${t('camStage')}</button><button data-cam="booth">${t('camBooth')}</button>
+        <button data-cam="wide" class="on">${ico('cam', 12)}${t('camWide')}</button><button data-cam="stage">${t('camStage')}</button><button data-cam="booth">${t('camBooth')}</button>
       </span>
-      <button class="sc-auto on" type="button">${t('autopilot')}</button>
-      <button class="sc-strobe" type="button" title="Space">${t('strobe')}</button>
-      <button class="sc-map on" type="button">${t('pixelmap')}</button>
+      <button class="sc-auto on" type="button">${ico('autopilot', 12)}${t('autopilot')}</button>
+      <button class="sc-strobe" type="button" title="Space">${ico('spark', 12)}${t('strobe')}</button>
+      <button class="sc-map on" type="button">${ico('pixelmap', 12)}${t('pixelmap')}</button>
     </div>
   </div>
   <aside class="pxmap">
@@ -81,9 +82,9 @@ export function stageMarkup(pm, { label } = {}) {
         <span class="build-desc"></span>
       </div>
       <div class="build-actions mono">
-        <button type="button" class="bd-auto">${t('autoBuild')}</button>
-        <button type="button" class="bd-next">${t('next')} →</button>
-        <button type="button" class="bd-close">${t('exitBuild')} ✕</button>
+        <button type="button" class="bd-auto">${ico('autopilot', 12)}${t('autoBuild')}</button>
+        <button type="button" class="bd-next">${t('next')}${ico('arrow', 12)}</button>
+        <button type="button" class="bd-close">${t('exitBuild')}${ico('close', 11)}</button>
       </div>
     </div>
     <div class="build-steps mono">

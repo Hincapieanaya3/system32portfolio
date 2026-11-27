@@ -4,6 +4,7 @@ import { mouse } from '../ui/cursor.js';
 import { lenis } from '../ui/scroll.js';
 import { bindReveal, scramble } from '../ui/fx.js';
 import { contactBlock, bindContact } from './home.js';
+import { ico } from '../ui/icons.js';
 
 export function renderIndex(app) {
   let view = 'list';
@@ -17,12 +18,12 @@ export function renderIndex(app) {
       <h1 class="big" data-reveal data-fit>${t('index')}<sup>${pad(projects.length)}</sup></h1>
       <div class="work-ctrl">
         <div class="chips" role="tablist">
-          <button class="chip on" data-cat="all"><span>${t('all')}</span><sup>${pad(projects.length)}</sup></button>
-          ${worlds.map((w) => `<button class="chip" data-cat="${w.id}" style="--wc:${w.accent}"><i class="wd"></i><span>${tr(w.shortName)}</span><sup>${pad(counts[w.id])}</sup></button>`).join('')}
+          <button class="chip on" data-cat="all">${ico('hub', 13)}<span>${t('all')}</span><sup>${pad(projects.length)}</sup></button>
+          ${worlds.map((w) => `<button class="chip" data-cat="${w.id}" style="--wc:${w.accent}">${ico(w.id, 13)}<span>${tr(w.shortName)}</span><sup>${pad(counts[w.id])}</sup></button>`).join('')}
         </div>
         <div class="views">
-          <button data-view="list" class="${view === 'list' ? 'on' : ''}" aria-label="List"><svg viewBox="0 0 20 20" width="18" height="18"><path d="M2 5h16M2 10h16M2 15h16" stroke="currentColor" stroke-width="1.5"/></svg></button>
-          <button data-view="grid" class="${view === 'grid' ? 'on' : ''}" aria-label="Grid"><svg viewBox="0 0 20 20" width="18" height="18"><path d="M2 2h7v7H2zM11 2h7v7h-7zM2 11h7v7H2zM11 11h7v7h-7z" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></button>
+          <button data-view="list" class="${view === 'list' ? 'on' : ''}" aria-label="List">${ico('list', 16)}</button>
+          <button data-view="grid" class="${view === 'grid' ? 'on' : ''}" aria-label="Grid">${ico('grid', 16)}</button>
         </div>
       </div>
     </header>
@@ -33,9 +34,9 @@ export function renderIndex(app) {
         <span class="r-n mono">${pad(p.index)}</span>
         <span class="r-t"><span class="r-title">${p.title}</span>${p.pixelmap && p.pixelmap.rig !== 'festival' ? `<em class="tag-px">PXMAP · ${p.pixelmap.rig.toUpperCase()}</em>` : ''}</span>
         <span class="r-c">${tr(p.role)}</span>
-        <span class="r-k mono"><i class="wd"></i>${w.index} ${tr(w.shortName)}</span>
+        <span class="r-k mono">${ico(w.id, 13)}${w.index} ${tr(w.shortName)}</span>
         <span class="r-y mono">${p.year}</span>
-        <span class="r-a" aria-hidden="true">↗</span>
+        <span class="r-a" aria-hidden="true">${ico('enter', 14)}</span>
       </a>`; }).join('')}
     </div>
     <div class="grid ${view === 'grid' ? '' : 'is-hidden'}">

@@ -4,6 +4,7 @@
 import { projectsOf, worldOf, games, t, tr, pad, asset, posterOf } from '../data.js';
 import { PropViewer } from '../gl/propviewer.js';
 import { bindReveal, bindAutoplay } from '../ui/fx.js';
+import { ico } from '../ui/icons.js';
 
 export function renderGamesWorld(app) {
   const w = worldOf('games');
@@ -20,10 +21,10 @@ export function renderGamesWorld(app) {
   function title() {
     el.innerHTML = `
     <section class="g-title" tabindex="0">
-      <p class="mono w-kicker"><span class="w-dot"></span>${tr({ es: 'MUNDO', en: 'WORLD' })} ${w.index} // PLAYER 1</p>
+      <p class="mono w-kicker">${ico('games', 13)}${tr({ es: 'MUNDO', en: 'WORLD' })} ${w.index} // PLAYER 1</p>
       <h1 class="g-logo" data-fit="125">${tr({ es: 'Videojuegos', en: 'Video games' })}</h1>
       <p class="mono dim">& 3D TECHNICAL ART</p>
-      <button class="g-start mono" type="button" data-cursor="START">▶ ${t('pressStart')}</button>
+      <button class="g-start mono" type="button" data-cursor="START">${ico('spark', 15)}${t('pressStart')}</button>
       <p class="mono dim g-hint">CLICK · TAP · ENTER</p>
     </section>`;
     const go = () => { try { sessionStorage.setItem('s32-start', '1'); } catch { /* */ } select(); };
@@ -36,7 +37,7 @@ export function renderGamesWorld(app) {
     cleanup();
     el.innerHTML = `
     <header class="w-head">
-      <p class="mono w-kicker"><span class="w-dot"></span>${tr({ es: 'MUNDO', en: 'WORLD' })} ${w.index} // ${w.coords}</p>
+      <p class="mono w-kicker">${ico('games', 13)}${tr({ es: 'MUNDO', en: 'WORLD' })} ${w.index} // ${w.coords}</p>
       <h1 class="w-title">${tr(w.name)}</h1>
       <p class="mono dim w-hint">${t('selectCart')}</p>
     </header>
@@ -63,8 +64,8 @@ export function renderGamesWorld(app) {
 
   const head = (p) => `
     <header class="w-head g-head">
-      <button class="pill g-eject mono" type="button">⏏ ${tr({ es: 'Cartuchos', en: 'Cartridges' })}</button>
-      <p class="mono w-kicker"><span class="w-dot"></span>${p.year} · ${tr(p.role)}</p>
+      <button class="pill g-eject mono" type="button">${ico('eject', 13)}${tr({ es: 'Cartuchos', en: 'Cartridges' })}</button>
+      <p class="mono w-kicker">${ico('games', 13)}${p.year} · ${tr(p.role)}</p>
       <h1 class="w-title">${p.title}</h1>
       <p class="g-sum">${tr(p.summary)}</p>
       <p class="tools-inline">${(p.tools || []).map((x) => `<span>${x}</span>`).join('')}</p>
@@ -79,7 +80,7 @@ export function renderGamesWorld(app) {
     ${head(p)}
     <section class="g-trailer"><video src="${asset(trailer.src)}" poster="${asset(trailer.poster)}" controls playsinline preload="metadata"></video><span class="mono g-cap">${tr(trailer.caption)}</span></section>
     <section class="g-hdr">
-      <div class="g-hdr-row"><h2 class="mono">${t('captures')}</h2><button class="pill pill--fill g-flash" type="button" data-cursor="BOOM">✦ ${t('hdrFlash')}</button></div>
+      <div class="g-hdr-row"><h2 class="mono">${t('captures')}</h2><button class="pill pill--fill g-flash" type="button" data-cursor="BOOM">${ico('spark', 14)}${t('hdrFlash')}</button></div>
       <div class="g-caps">${caps.map((c) => `<figure class="g-capfig"><img src="${asset(c.src)}" alt="${tr(c.caption)}" loading="lazy"><figcaption class="mono">${tr(c.caption)}</figcaption></figure>`).join('')}</div>
     </section>
     <section class="g-devlogs">
